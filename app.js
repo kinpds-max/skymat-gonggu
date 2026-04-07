@@ -1776,20 +1776,75 @@ HASNOL 하스놀 드림`;
     // --- HTML 저장 기능 (상세 견적 전용) ---
     const downloadHtmlBtnDetailed = document.getElementById('downloadHtmlBtnDetailed');
     if (downloadHtmlBtnDetailed) {
-        downloadHtmlBtnDetailed.addEventListener('click', () => {
-            const htmlContent = document.documentElement.outerHTML;
-            const blob = new Blob(['<!DOCTYPE html>\n' + htmlContent], { type: 'text/html;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
+        downloadHtmlBtnDetailed.addEventListener('click', async () => {
             const name = customerNameIpt?.value || '고객';
-            const filename = `HASNOL_견적서_${name}.html`;
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            showToast('💾 HTML 파일이 저장되었습니다.');
+            const folderName = `HASNOL_견적서_${name}`;
+
+            downloadHtmlBtnDetailed.innerHTML = '⏳';
+            downloadHtmlBtnDetailed.disabled = true;
+
+            try {
+                // style.css 내용 가져오기
+                let cssContent = '';
+                try {
+                    const res = await fetch('style.css');
+                    cssContent = await res.text();
+                } catch(e) {
+                    console.warn('style.css 로드 실패, 인라인 스타일로 대체');
+                }
+
+                // HTML에 CSS 인라인 삽입 (외부 link 태그 제거)
+                const rawHtml = document.documentElement.outerHTML;
+                const inlinedHtml = rawHtml.replace(
+                    /<link[^>]+href=["']style\.css["'][^>]*>/gi,
+                    cssContent ? `<style>\n${cssContent}\n</style>` : ''
+                );
+                const htmlFinal = '<!DOCTYPE html>\n' + inlinedHtml;
+
+                if (typeof JSZip === 'undefined') {
+                    // JSZip 없으면 단순 HTML 다운로드로 폴백
+                    const blob = new Blob([htmlFinal], { type: 'text/html;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url; a.download = `${folderName}.html`;
+                    document.body.appendChild(a); a.click();
+                    document.body.removeChild(a); URL.revokeObjectURL(url);
+                    showToast('💾 HTML 파일이 저장되었습니다.');
+                    return;
+                }
+
+                // ZIP 생성
+                const zip = new JSZip();
+                const folder = zip.folder(folderName);
+
+                // 견적 HTML (CSS 인라인 포함 — 단독 실행 가능)
+                folder.file(`${folderName}.html`, htmlFinal);
+
+                // 안내 텍스트 파일
+                folder.file('열람방법.txt',
+                    `📂 HASNOL 하스놀 견적서 패키지\n\n` +
+                    `▶ ${folderName}.html 파일을 브라우저(크롬/엣지/사파리)로 열어주세요.\n` +
+                    `  파일을 더블클릭하거나, 브라우저에 드래그&드롭 하시면 됩니다.\n\n` +
+                    `☎ 문의: 1660-1195\n` +
+                    `🌐 www.hasnol.kr\n`
+                );
+
+                const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
+                const url = URL.createObjectURL(zipBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${folderName}.zip`;
+                document.body.appendChild(a); a.click();
+                document.body.removeChild(a); URL.revokeObjectURL(url);
+
+                showToast('📦 ZIP 파일이 저장되었습니다! 고객에게 파일을 전송해 주세요.');
+            } catch (err) {
+                console.error('ZIP 생성 오류:', err);
+                showToast('⚠️ ZIP 생성 중 오류가 발생했습니다.');
+            } finally {
+                downloadHtmlBtnDetailed.innerHTML = '💾';
+                downloadHtmlBtnDetailed.disabled = false;
+            }
         });
     }
 
