@@ -1808,8 +1808,12 @@ HASNOL 하스놀 드림`;
     
     // Initialize Supabase only if values are provided
     let supabaseClient = null;
-    if (SUPABASE_URL !== 'YOUR_SUPABASE_PROJECT_URL' && window.supabase) {
-        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    try {
+        if (SUPABASE_URL !== 'YOUR_SUPABASE_PROJECT_URL' && window.supabase) {
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        }
+    } catch (e) {
+        console.warn('Supabase 초기화 실패 (클라우드 저장 비활성):', e);
     }
 
     async function saveEstimateToCloud() {
