@@ -485,6 +485,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (infoInstallFee) infoInstallFee.textContent = totalFees.toLocaleString();
         if (infoFinalPrice) infoFinalPrice.textContent = finalPrice.toLocaleString();
 
+        // Update Floating Bottom Bar
+        const baQty = document.getElementById('ba_qty');
+        const baTotal = document.getElementById('ba_total');
+        if (baQty) baQty.textContent = totalQtyWithSpare.toLocaleString() + '장';
+        if (baTotal) baTotal.textContent = finalPrice.toLocaleString() + '원';
+
 
         if (contractTotal) contractTotal.textContent = finalPrice.toLocaleString();
 
@@ -1667,15 +1673,50 @@ HASNOL 하스놀 드림`;
 
     // 이메일 앱 열기
     if (sendEmailBtn) {
-        sendEmailBtn.addEventListener('click', () => {
+        sendEmailBtn.addEventListener('click', async () => {
+            const format = document.querySelector('input[name="emailFormat"]:checked')?.value || 'html';
+            const name = customerNameIpt?.value || '고객';
+
+            if (format === 'pdf') {
+                showToast('⏳ PDF 생성 중입니다...');
+                const result = await buildPDFBlob(sendEmailBtn);
+                if (result) {
+                    downloadBlobFile(result.blob, result.fileName);
+                    showToast('✅ PDF 다운로드 완료! 메일 앱이 열리면 파일을 첨부하세요.');
+                }
+            } else {
+                // HTML 저장
+                if (downloadHtmlBtnDetailed) {
+                    downloadHtmlBtnDetailed.click();
+                    showToast('✅ HTML 현황판 다운로드 완료! 메일 앱이 열리면 파일을 첨부하세요.');
+                }
+            }
+
             const to = encodeURIComponent(emailToIpt?.value || '');
             const subject = encodeURIComponent(emailSubjectIpt?.value || '');
             const body = encodeURIComponent(emailBodyTxt?.value || '');
-            window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
-            showToast('✉️ 이메일 앱이 열립니다. PDF 파일을 첨부해 주세요!');
-            setTimeout(closeEmailComposeModal, 1200);
+            
+            setTimeout(() => {
+                window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+            }, 800);
+            
+            setTimeout(closeEmailComposeModal, 1500);
         });
     }
+
+    // 포맷 선택에 따른 안내 문구 실시간 변경
+    document.querySelectorAll('input[name="emailFormat"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            const guide = document.getElementById('emailAttachmentGuide');
+            if (guide) {
+                if (e.target.value === 'pdf') {
+                    guide.innerHTML = '<strong>PDF 견적서 자동 다운로드 후 첨부</strong><br>이메일 앱이 열리면 다운로드된 PDF 파일을 첨부해 주세요.';
+                } else {
+                    guide.innerHTML = '<strong>HTML 파일 자동 다운로드 후 첨부</strong><br>이메일 앱이 열리면 다운로드된 HTML 파일을 첨부해 주세요.';
+                }
+            }
+        });
+    });
 
     // 🔔 토스트 알림 헬퍼
     function showToast(message) {
@@ -1746,11 +1787,8 @@ HASNOL 하스놀 드림`;
     const shareCustomerEmailBtnDetailed = document.getElementById('shareCustomerEmailBtnDetailed');
     if (shareCustomerEmailBtnDetailed) {
         shareCustomerEmailBtnDetailed.addEventListener('click', () => {
-            // HTML 저장 먼저 실행
-            if (downloadHtmlBtnDetailed) downloadHtmlBtnDetailed.click();
-            
-            // 그 다음 이메일 모달 열기
-            setTimeout(openEmailComposeModal, 600);
+            // 이제 모달에서 다운로드 형식을 선택하므로 바로 모달만 열기
+            openEmailComposeModal();
         });
     }
 });

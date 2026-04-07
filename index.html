@@ -670,20 +670,34 @@
         </div>
     </section>
 
-    <!-- Fixed Bottom Action Bar -->
-    <div class="bottom-action-bar no-print" style="display:flex; justify-content:center; gap:12px; padding:20px; background:rgba(255,255,255,0.95); backdrop-filter:blur(10px); border-top:1px solid #eee; position:fixed; bottom:0; left:0; right:0; z-index:1000;">
-      <button class="btn btn-secondary" id="downloadPdfBtn" style="padding:16px 24px; font-weight:700; border-radius:14px; background:#475569; color:white; border:none; display:flex; align-items:center; gap:8px;">
-        <i data-lucide="printer"></i> PDF 출력/인쇄
-      </button>
-      <button class="btn btn-primary" id="downloadHtmlBtnDetailed" style="padding:16px 24px; font-weight:700; border-radius:14px; background:#6366f1; color:white; border:none; display:flex; align-items:center; gap:8px;">
-        💾 HTML 저장
-      </button>
-      <button class="btn btn-primary" id="shareCustomerEmailBtnDetailed" style="padding:16px 24px; font-weight:700; border-radius:14px; background:#10B981; color:white; border:none; display:flex; align-items:center; gap:8px;">
-        ✉️ 이메일 발송
-      </button>
-      <button class="btn btn-primary" id="sharePdfBtn" style="padding:16px 24px; font-weight:700; border-radius:14px; background:var(--primary); color:white; border:none; display:flex; align-items:center; gap:8px;">
-        <i data-lucide="share-2"></i> PDF 공유
-      </button>
+    <!-- Premium Floating Bottom Bar -->
+    <div class="bottom-actions-float no-print">
+      <div class="ba-summary">
+        <div class="ba-item">
+          <span class="ba-label">시공 수량</span>
+          <span class="ba-value" id="ba_qty">0장</span>
+        </div>
+        <div class="ba-divider"></div>
+        <div class="ba-item ba-main">
+          <span class="ba-label">최종 견적액</span>
+          <span class="ba-value" id="ba_total" style="color: #38BDF8;">0원</span>
+        </div>
+      </div>
+
+      <div class="ba-btns">
+        <button class="btn-ba-secondary" id="downloadPdfBtn" title="PDF 저장/인쇄">
+          🖨️
+        </button>
+        <button class="btn-ba-secondary" id="downloadHtmlBtnDetailed" title="HTML 저장">
+          💾
+        </button>
+        <button class="btn-ba-secondary" id="shareCustomerEmailBtnDetailed" title="이메일 발송">
+          ✉️
+        </button>
+        <button class="btn-ba-primary" id="sharePdfBtn">
+          <span>📤 견적 공유하기</span>
+        </button>
+      </div>
     </div>
 
     <footer style="text-align: center; margin-top: 40px; color: var(--text-muted); font-size: 0.85rem;">
@@ -773,9 +787,20 @@
         <textarea id="emailBody" rows="10" style="width:100%; padding:14px 16px; border:1.5px solid #e0e0e0; border-radius:12px; font-size:0.88rem; line-height:1.7; box-sizing:border-box; resize:vertical; font-family:inherit; transition:border 0.2s;" onfocus="this.style.borderColor='#1a73e8'" onblur="this.style.borderColor='#e0e0e0'"></textarea>
       </div>
 
-      <div style="background:#e8f5e9; border:1px solid #c8e6c9; border-radius:12px; padding:12px 16px; margin-bottom:20px; font-size:0.82rem; color:#2e7d32; display:flex; align-items:center; gap:10px;">
+      <!-- 전송 포맷 선택 -->
+      <div style="margin-bottom:20px; display:flex; align-items:center; gap:24px; padding:16px; background:#f8f9fa; border-radius:12px;">
+        <span style="font-weight:700; font-size:0.85rem; color:#333;">📦 전송 포맷 선택:</span>
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.9rem; font-weight:600;">
+          <input type="radio" name="emailFormat" value="html" checked style="width:18px; height:18px;"> HTML 현황판
+        </label>
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.9rem; font-weight:600;">
+          <input type="radio" name="emailFormat" value="pdf" style="width:18px; height:18px;"> PDF 견적서
+        </label>
+      </div>
+
+      <div style="background:#eef2ff; border:1px solid #e0e7ff; border-radius:12px; padding:12px 16px; margin-bottom:20px; font-size:0.82rem; color:#3730a3; display:flex; align-items:center; gap:10px;">
         <span style="font-size:1.4rem;">📎</span>
-        <div>
+        <div id="emailAttachmentGuide">
           <strong>HTML 파일 자동 다운로드 후 첨부</strong><br>
           이메일 앱이 열리면 다운로드된 HTML 파일을 첨부해 주세요.
         </div>
@@ -789,23 +814,147 @@
   </div>
 
   <style>
-    :root { --shadow-premium: 0 12px 48px rgba(0, 0, 0, 0.08); }
-    .share-opt-btn {
-      display: flex; flex-direction: column; align-items: center; gap: 6px;
-      padding: 20px 10px; border: none; border-radius: 18px;
-      cursor: pointer; font-size: 0.85rem; color: var(--text-main);
-      transition: transform 0.15s, box-shadow 0.15s;
+    :root { 
+      --shadow-premium: 0 12px 48px rgba(0, 0, 0, 0.08); 
     }
-    .share-opt-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
-    .share-opt-btn small { font-size: 0.72rem; color: #999; font-weight: 400; }
+    
+    .share-opt-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      padding: 24px 10px; border: none; border-radius: 20px;
+      cursor: pointer; font-size: 0.9rem; color: #1e293b;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .share-opt-btn:hover { 
+      transform: translateY(-4px); 
+      box-shadow: 0 12px 24px rgba(0,0,0,0.1); 
+      background: #fff !important;
+    }
+    .share-opt-btn span:first-child { transition: transform 0.2s; }
+    .share-opt-btn:hover span:first-child { transform: scale(1.2); }
+    .share-opt-btn small { font-size: 0.72rem; color: #64748b; font-weight: 400; margin-top: 2px; }
+
+    /* 프리미엄 플로팅 하단 바 스타일 */
+    .bottom-actions-float {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 40px);
+      max-width: 950px;
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 28px;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .bottom-actions-float:hover {
+      bottom: 30px;
+      border-color: rgba(14, 165, 233, 0.4);
+    }
+
+    .ba-summary {
+      display: flex;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .ba-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ba-label {
+      font-size: 0.65rem;
+      color: rgba(255, 255, 255, 0.5);
+      font-weight: 700;
+      margin-bottom: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .ba-value {
+      font-family: 'Outfit', sans-serif;
+      color: white;
+      font-weight: 800;
+      font-size: 1.15rem;
+      line-height: 1;
+    }
+
+    .ba-divider {
+      width: 1.5px;
+      height: 28px;
+      background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.2), transparent);
+    }
+
+    .ba-btns {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .btn-ba-primary {
+      background: linear-gradient(135deg, #0EA5E9 0%, #2563EB 100%);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      padding: 12px 28px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.3s;
+      box-shadow: 0 10px 20px -5px rgba(14, 165, 233, 0.5);
+    }
+
+    .btn-ba-primary:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 15px 30px -5px rgba(14, 165, 233, 0.6);
+    }
+
+    .btn-ba-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-size: 1.2rem;
+    }
+
+    .btn-ba-secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
 
     @media (max-width: 768px) {
-      :root { --border-radius: 16px; }
-      .container { padding: 40px 15px; }
-      h1 { font-size: 2.2rem; }
-      .card { padding: 25px 20px; }
-      .grid-layout { grid-template-columns: 1fr !important; }
-      input, select, button { font-size: 16px !important; }
+      .bottom-actions-float {
+        bottom: 16px;
+        padding: 12px 20px;
+        width: calc(100% - 32px);
+        border-radius: 20px;
+      }
+      .ba-item:not(.ba-main) { display: none; }
+      .ba-divider { display: none; }
+      .btn-ba-primary span { display: none; }
+      .btn-ba-primary { padding: 12px; width: 50px; height: 50px; justify-content: center; border-radius: 16px; }
+      .btn-ba-primary::after { content: '📤'; font-size: 1.2rem; }
     }
   </style>
 
