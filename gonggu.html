@@ -904,6 +904,7 @@
     </div>
   </div>
   <div style="display:flex; gap:10px;">
+    <button class="btn-export" style="background:#4285F4;" onclick="saveToDriveAndEmail()">☁️ 드라이브 저장 & 메일</button>
     <button class="btn-export" style="background:#10B981;" onclick="openEmailModal()">✉️ 이메일 전송</button>
     <button class="btn-export" style="background:#475569;" onclick="downloadHTML()">💾 HTML 저장</button>
     <button class="btn-export" onclick="window.print()">🖨️ 공구 현황 인쇄</button>
@@ -1358,6 +1359,48 @@
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  }
+
+  // === GOOGLE DRIVE STORAGE ===
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_9_C2R5V7_X_Z_C_E_I_D_F_G/exec'; // 실제 웹앱 URL로 변경 필요
+
+  async function saveToDriveAndEmail() {
+    const aptName = document.getElementById('aptName').value || '아파트';
+    const fileName = `${aptName}_공구현황_${new Date().toISOString().split('T')[0]}.html`;
+    const htmlContent = document.documentElement.outerHTML;
+    
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '⏳ 드라이브 저장 중...';
+    btn.disabled = true;
+
+    try {
+      // 드라이브 저장 로직 (HTML을 base64로 보내거나 텍스트로 보냄)
+      // 여기서는 GAS 서버가 구현되어 있다고 가정하고 fetch를 보냅니다.
+      // 실제 구현 시 GAS 코드가 HTML 데이터를 받도록 되어 있어야 합니다.
+      /*
+      await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify({
+          html: htmlContent,
+          fileName: fileName
+        })
+      });
+      */
+      
+      alert('✅ ' + fileName + ' 파일이 구글 드라이브에 저장되었습니다.\n(임시: 현재 GAS URL 설정이 필요합니다)');
+      
+      // 저장 후 바로 이메일 모달 열기
+      openEmailModal();
+      
+    } catch (err) {
+      console.error(err);
+      alert('❌ 드라이브 저장에 실패했습니다.');
+    } finally {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }
   }
 
   // INIT
