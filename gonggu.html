@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>하늘매트 짝궁공구 관리 시스템</title>
+  <meta name="description" content="하늘매트 아파트 공동구매 짝궁공구 견적 정리 시스템">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sky: #0EA5E9;
+      --sky-dark: #0284C7;
+      --sky-light: #E0F2FE;
+      --sky-pale: #F0F9FF;
+      --gold: #F59E0B;
+      --green: #10B981;
+      --red: #EF4444;
+      --purple: #8B5CF6;
+      --text: #0F172A;
+      --text-muted: #64748B;
+      --border: #E2E8F0;
+      --bg: #F8FAFC;
+      --card: #FFFFFF;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(14,165,233,0.06);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    .top-header {
+      background: linear-gradient(135deg, #0F172A 0%, #1E3A5F 100%);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+    }
+    .logo-area { display: flex; align-items: center; gap: 12px; }
+    .logo-badge {
+      background: linear-gradient(135deg, var(--sky), var(--sky-dark));
+      color: white;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      padding: 6px 14px;
+      border-radius: 10px;
+      letter-spacing: -0.02em;
+    }
+    .logo-text {
+      color: white;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+    }
+    .logo-sub { color: rgba(255,255,255,0.5); font-size: 0.75rem; }
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    .btn-print {
+      background: rgba(255,255,255,0.1);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 8px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .btn-print:hover { background: rgba(255,255,255,0.2); }
+
+    /* MAIN */
+    .main { max-width: 1200px; margin: 0 auto; padding: 28px 20px 120px; }
+
+    /* SETUP CARD */
+    .setup-card {
+      background: linear-gradient(135deg, #0F172A 0%, #1C3557 100%);
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 24px;
+      color: white;
+      box-shadow: var(--shadow-lg);
+    }
+    .setup-card h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .setup-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 200px 180px;
+      gap: 14px;
+    }
+    .setup-field label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .setup-field input, .setup-field select {
+      width: 100%;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: white;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .setup-field input::placeholder { color: rgba(255,255,255,0.35); }
+    .setup-field input:focus, .setup-field select:focus {
+      border-color: var(--sky);
+      background: rgba(14,165,233,0.1);
+    }
+    .setup-field select option { background: #1E3A5F; color: white; }
+
+    /* CALC CARD */
+    .calc-card {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+      border: 1px dashed var(--sky);
+    }
+    .calc-card-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--sky-dark);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .space-row {
+      display: grid;
+      grid-template-columns: 140px 1fr 1fr 40px;
+      gap: 12px;
+      margin-bottom: 12px;
+      align-items: end;
+    }
+    .space-row .form-group { margin: 0; }
+    .btn-remove-space {
+      background: #FEE2E2; color: #EF4444; border: none; border-radius: 10px;
+      height: 42px; display: flex; align-items: center; justify-content: center; cursor: pointer;
+      font-weight: 800; transition: 0.2s;
+    }
+    .btn-remove-space:hover { background: #FECACA; }
+    .btn-add-space {
+      background: transparent; border: 1.5px dashed var(--sky); color: var(--sky-dark);
+      padding: 10px 16px; border-radius: 10px; font-weight: 700; width: 100%;
+      cursor: pointer; transition: 0.2s; margin-bottom: 20px;
+    }
+    .btn-add-space:hover { background: var(--sky-pale); }
+    .calc-results {
+      background: #F8FAFC; border-radius: 12px; padding: 16px 20px;
+      border: 1px solid var(--border);
+      display: flex; gap: 20px; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    }
+    .calc-res-item { text-align: center; }
+    .calc-res-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; margin-bottom: 4px; }
+    .calc-res-val { font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 800; color: var(--sky-dark); }
+
+    /* TIER DASHBOARD */
+    .tier-dashboard {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+    .tier-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .tier-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--text);
+    }
+    .current-tier-badge {
+      background: linear-gradient(135deg, var(--sky), var(--sky-dark));
+      color: white;
+      padding: 8px 18px;
+      border-radius: 30px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      font-family: 'Outfit', sans-serif;
+    }
+    .tier-track {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .tier-node {
+      flex: 1;
+      text-align: center;
+      position: relative;
+    }
+    .tier-node::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      width: 100%;
+      height: 3px;
+      background: var(--border);
+      z-index: 0;
+    }
+    .tier-node:last-child::before { display: none; }
+    .tier-node.active::before { background: var(--sky); }
+    .tier-dot {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.85rem;
+      margin: 0 auto 8px;
+      position: relative;
+      z-index: 1;
+      color: var(--text-muted);
+      transition: all 0.3s;
+    }
+    .tier-node.active .tier-dot {
+      background: linear-gradient(135deg, var(--sky), var(--sky-dark));
+      color: white;
+      box-shadow: 0 4px 14px rgba(14,165,233,0.4);
+    }
+    .tier-node.current .tier-dot {
+      background: linear-gradient(135deg, var(--gold), #D97706);
+      color: white;
+      box-shadow: 0 4px 14px rgba(245,158,11,0.4);
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 4px 14px rgba(245,158,11,0.4); }
+      50% { box-shadow: 0 4px 24px rgba(245,158,11,0.7); }
+    }
+    .tier-label { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); }
+    .tier-node.active .tier-label { color: var(--sky-dark); }
+    .tier-node.current .tier-label { color: var(--gold); }
+    .tier-discount { font-size: 0.7rem; color: var(--green); font-weight: 700; }
+
+    /* STATS ROW */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px 16px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+    .stat-icon { font-size: 1.5rem; margin-bottom: 8px; }
+    .stat-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-label { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; }
+    .stat-card.highlight { background: linear-gradient(135deg, var(--sky-pale), #DBEAFE); border-color: var(--sky); }
+    .stat-card.highlight .stat-value { color: var(--sky-dark); }
+
+    /* ADD FORM */
+    .add-form-card {
+      background: var(--card);
+      border: 1.5px dashed var(--sky);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+    .add-form-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--sky-dark);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .add-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 130px 130px 170px 120px;
+      gap: 12px;
+      align-items: end;
+      margin-bottom: 14px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 7px;
+    }
+    .form-group input, .form-group select {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      font-family: inherit;
+      color: var(--text);
+      background: #FAFBFC;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .form-group input:focus, .form-group select:focus {
+      border-color: var(--sky);
+      background: var(--sky-pale);
+    }
+    .form-group input::placeholder { color: #CBD5E1; }
+    .btn-add {
+      background: linear-gradient(135deg, var(--sky), var(--sky-dark));
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 11px 20px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .btn-add:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(14,165,233,0.4); }
+
+    /* FORM ROW 2 */
+    .add-form-row2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* DISCOUNT CHIPS */
+    .discount-chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+    .d-chip {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s;
+      background: #F1F5F9;
+      color: var(--text-muted);
+    }
+    .d-chip.active {
+      background: var(--sky-pale);
+      border-color: var(--sky);
+      color: var(--sky-dark);
+    }
+    .d-chip:hover { border-color: var(--sky); }
+    .d-chip-label { font-size: 0.72rem; font-weight: 600; color: var(--text-muted); margin-right: 6px; }
+
+    /* TABLE */
+    .table-card {
+      background: var(--card);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      background: #FAFBFC;
+    }
+    .table-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    thead th {
+      background: #F8FAFC;
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    tbody tr {
+      border-bottom: 1px solid #F1F5F9;
+      transition: background 0.15s;
+    }
+    tbody tr:hover { background: var(--sky-pale); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody td {
+      padding: 13px 16px;
+      vertical-align: middle;
+    }
+    .num-badge {
+      width: 28px; height: 28px;
+      background: var(--sky-light);
+      color: var(--sky-dark);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.78rem;
+    }
+    .spec-tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: var(--sky-light);
+      color: var(--sky-dark);
+    }
+    .spec-tag.leather { background: #FEF3C7; color: #B45309; }
+    .price-cell {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      color: var(--sky-dark);
+    }
+    .total-cell {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: var(--text);
+    }
+    .del-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #CBD5E1;
+      font-size: 1.1rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: all 0.15s;
+    }
+    .del-btn:hover { background: #FEE2E2; color: var(--red); }
+    .discount-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+    .dtag {
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+      background: #F0FDF4;
+      color: #059669;
+    }
+
+    /* SUMMARY FOOTER */
+    .summary-footer {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: linear-gradient(135deg, #0F172A 0%, #1C3557 100%);
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 -4px 24px rgba(0,0,0,0.2);
+      z-index: 99;
+    }
+    .summary-items { display: flex; align-items: center; gap: 32px; }
+    .summary-item { text-align: center; }
+    .s-value {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: white;
+    }
+    .s-label { font-size: 0.68rem; color: rgba(255,255,255,0.5); font-weight: 600; }
+    .s-divider { width: 1px; height: 36px; background: rgba(255,255,255,0.15); }
+    .btn-export {
+      background: linear-gradient(135deg, var(--sky), var(--sky-dark));
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-export:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(14,165,233,0.5); }
+
+    /* EMPTY STATE */
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-muted);
+    }
+    .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+    .empty-state p { font-size: 0.9rem; }
+
+    /* NEXT TIER HINT */
+    .next-tier-hint {
+      background: linear-gradient(135deg, #FFFBEB, #FEF3C7);
+      border: 1px solid #FDE68A;
+      border-radius: 12px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .next-tier-hint .nt-icon { font-size: 1.3rem; }
+    .next-tier-hint p { font-size: 0.82rem; color: #92400E; font-weight: 600; }
+    .next-tier-hint strong { color: #B45309; }
+
+    /* NOTE AREA */
+    .note-area {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+    .note-area label { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 8px; }
+    .note-area textarea {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      resize: none;
+      color: var(--text);
+      outline: none;
+      transition: border 0.2s;
+    }
+    .note-area textarea:focus { border-color: var(--sky); }
+
+    .print-only { display: none; }
+
+    @media print {
+      .top-header, .add-form-card, .summary-footer, .del-btn, .no-print { display: none !important; }
+      .print-only { display: block !important; }
+      body { background: white; }
+      .main { padding: 10px; max-width: 100%; }
+      .setup-card { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+
+    @media (max-width: 900px) {
+      .setup-grid { grid-template-columns: 1fr 1fr; }
+      .add-form-grid { grid-template-columns: 1fr 1fr; }
+      .add-form-row2 { grid-template-columns: 1fr 1fr; }
+      .stats-row { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .setup-grid { grid-template-columns: 1fr; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .summary-items { gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="top-header no-print">
+  <div class="logo-area">
+    <div class="logo-badge">하늘매트</div>
+    <div>
+      <div class="logo-text">짝궁공구 관리 시스템</div>
+      <div class="logo-sub">아파트 단지 공동구매 견적 정리</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <button class="btn-print" onclick="window.print()">🖨️ 인쇄</button>
+    <button class="btn-print" onclick="location.href='index.html'">📋 견적기로</button>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- SETUP -->
+  <div class="setup-card">
+    <h2>🏢 공구 기본 정보 설정</h2>
+    <div class="setup-grid">
+      <div class="setup-field">
+        <label>아파트 단지명</label>
+        <input type="text" id="aptName" placeholder="예: 힐스테이트 1단지" oninput="saveSetup()">
+      </div>
+      <div class="setup-field">
+        <label>소재지 / 동</label>
+        <input type="text" id="aptLocation" placeholder="예: 서울 강남구 역삼동" oninput="saveSetup()">
+      </div>
+      <div class="setup-field">
+        <label>공구 시작일</label>
+        <input type="date" id="startDate" oninput="saveSetup()">
+      </div>
+      <div class="setup-field">
+        <label>공구 마감일</label>
+        <input type="date" id="endDate" oninput="saveSetup()">
+      </div>
+    </div>
+  </div>
+
+  <!-- HASNOL CALCULATOR -->
+  <div class="calc-card no-print">
+    <div class="calc-card-title">
+      📐 하스놀 상세 공간 견적기
+      <span style="font-size:0.75rem; font-weight:600; color:var(--text-muted); margin-left:10px; font-family:'Noto Sans KR', sans-serif;">
+        가로/세로(cm)를 입력하면 로스 포함 예상 장수를 계산합니다.
+      </span>
+    </div>
+    
+    <!-- PRESETS -->
+    <div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; align-items:center; background:#F8FAFC; padding:12px; border-radius:12px; border:1px solid var(--border);">
+      <span style="font-size:0.75rem; font-weight:700; color:var(--text-muted); margin-right:8px;">타입별 불러오기:</span>
+      <button class="d-chip" onclick="loadSpacesPreset('59')" style="border-color:var(--sky); background:white;">59타입</button>
+      <button class="d-chip" onclick="loadSpacesPreset('79A')" style="border-color:var(--sky); background:white;">79A타입</button>
+      <button class="d-chip" onclick="loadSpacesPreset('79C')" style="border-color:var(--sky); background:white;">79C타입</button>
+      <button class="d-chip" onclick="loadSpacesPreset('84')" style="border-color:var(--sky); background:white;">84타입</button>
+      <span style="flex:1"></span>
+      <select id="presetToSave" style="padding:6px 10px; border-radius:8px; border:1px solid var(--border); font-size:0.8rem; font-family:inherit; outline:none;">
+        <option value="59">59타입</option>
+        <option value="79A">79A타입</option>
+        <option value="79C">79C타입</option>
+        <option value="84">84타입</option>
+      </select>
+      <button class="btn-print" style="margin-left:8px; background:var(--sky-dark); color:white; border:none;" onclick="saveSpacesPreset()">현재 공간규격 저장</button>
+    </div>
+
+    <div id="spaceInputsContainer"></div>
+    <button class="btn-add-space" onclick="addSpaceRow()">➕ 시공 공간 추가하기</button>
+    
+    <div class="calc-results">
+      <div class="calc-res-item" style="text-align: left;">
+        <div class="calc-res-label">합산 면적</div>
+        <div class="calc-res-val" id="resArea" style="color:var(--text)">0 <span style="font-size:0.8rem">m²</span></div>
+      </div>
+      <div class="calc-res-item">
+        <div class="calc-res-label">600 (장)</div>
+        <div class="calc-res-val" id="res600">0</div>
+      </div>
+      <div class="calc-res-item">
+        <div class="calc-res-label">800 (장)</div>
+        <div class="calc-res-val" id="res800">0</div>
+      </div>
+      <div class="calc-res-item">
+        <div class="calc-res-label">1000 (장)</div>
+        <div class="calc-res-val" id="res1000">0</div>
+      </div>
+      <div class="calc-res-item">
+        <div class="calc-res-label">1200 (장)</div>
+        <div class="calc-res-val" id="res1200">0</div>
+      </div>
+      <button class="btn-add" style="width:auto; padding:8px 16px; margin:0;" onclick="copyCalcToForm()">⬇️ 아래 폼에 수량 복사</button>
+    </div>
+  </div>
+
+  <!-- TIER DASHBOARD -->
+  <div class="tier-dashboard">
+    <div class="tier-header">
+      <div class="tier-title">🎯 짝궁공구 할인 티어 현황</div>
+      <div class="current-tier-badge" id="currentTierBadge">0세대 — 기본가</div>
+    </div>
+    <div class="tier-track" id="tierTrack">
+      <div class="tier-node" id="tn0">
+        <div class="tier-dot">시작</div>
+        <div class="tier-label">0세대</div>
+        <div class="tier-discount">기본가</div>
+      </div>
+      <div class="tier-node" id="tn2">
+        <div class="tier-dot">2</div>
+        <div class="tier-label">2세대</div>
+        <div class="tier-discount">-500원/장</div>
+      </div>
+      <div class="tier-node" id="tn3">
+        <div class="tier-dot">3</div>
+        <div class="tier-label">3세대</div>
+        <div class="tier-discount">-1,000원/장</div>
+      </div>
+      <div class="tier-node" id="tn7">
+        <div class="tier-dot">7</div>
+        <div class="tier-label">7세대</div>
+        <div class="tier-discount">-1,500원/장</div>
+      </div>
+      <div class="tier-node" id="tn10">
+        <div class="tier-dot">10</div>
+        <div class="tier-label">10세대+</div>
+        <div class="tier-discount">-2,000원/장</div>
+      </div>
+    </div>
+    <div id="nextTierHint"></div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon">👥</div>
+      <div class="stat-value" id="statTotal">0</div>
+      <div class="stat-label">총 참여 세대</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📦</div>
+      <div class="stat-value" id="statMats">0</div>
+      <div class="stat-label">총 매트 수량</div>
+    </div>
+    <div class="stat-card highlight">
+      <div class="stat-icon">💰</div>
+      <div class="stat-value" id="statDiscount">0원</div>
+      <div class="stat-label">현재 할인 (세대당)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🧾</div>
+      <div class="stat-value" id="statTotal2">—</div>
+      <div class="stat-label">총 견적 합계</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div class="stat-value" id="statAvg">—</div>
+      <div class="stat-label">세대 평균 금액</div>
+    </div>
+  </div>
+
+  <!-- ADD FORM -->
+  <div class="add-form-card no-print">
+    <div class="add-form-title">➕ 신청자 추가</div>
+    <div class="add-form-grid">
+      <div class="form-group">
+        <label>고객명</label>
+        <input type="text" id="f_name" placeholder="예: 홍길동">
+      </div>
+      <div class="form-group">
+        <label>연락처</label>
+        <input type="text" id="f_phone" placeholder="010-0000-0000">
+      </div>
+      <div class="form-group">
+        <label>동/호수</label>
+        <input type="text" id="f_unit" placeholder="예: 101동 1402호">
+      </div>
+      <div class="form-group">
+        <label>평형</label>
+        <select id="f_pyeong" onchange="autoFillQty()">
+          <option value="">직접입력</option>
+          <option value="24_hall">24평 거실복도 (70장)</option>
+          <option value="24_full">24평 거복주 (85장)</option>
+          <option value="34_hall">34평 거실복도 (85장)</option>
+          <option value="34_full">34평 거복주 (110장)</option>
+          <option value="40_hall">40평 거실복도 (110장)</option>
+          <option value="40_full">40평 거실복도주방 (140장)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>매트 규격</label>
+        <select id="f_spec" onchange="autoFillQty()">
+          <option value="600_std">600mm 스탠다드</option>
+          <option value="600_lea">600mm 레더</option>
+          <option value="800_std">800mm 스탠다드</option>
+          <option value="800_lea" selected>800mm 레더 ⭐</option>
+          <option value="1000_lea">1000mm 레더</option>
+          <option value="1200_lea">1200mm 레더</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>수량 (장)</label>
+        <input type="number" id="f_qty" placeholder="예: 85" min="1">
+      </div>
+    </div>
+
+    <!-- 추가 할인 옵션 -->
+    <div class="discount-chips">
+      <span class="d-chip-label">추가 할인:</span>
+      <div class="d-chip" id="chip_review1" onclick="toggleChip('review1')">📱 후기 2곳 (-1,000원/장)</div>
+      <div class="d-chip" id="chip_review2" onclick="toggleChip('review2')">⭐ 추가후기 2곳 (-3만원)</div>
+      <div class="d-chip" id="chip_welfare" onclick="toggleChip('welfare')">💙 우대/다자녀 (-500원/장)</div>
+      <div class="d-chip" id="chip_refer" onclick="toggleChip('refer')">🤝 소개 (-5만원)</div>
+      <div class="d-chip" id="chip_regional" onclick="toggleChip('regional')">🚚 지방배송 (+10만원)</div>
+    </div>
+
+    <div style="margin-top:14px; display:flex; gap:10px; align-items:center;">
+      <div class="form-group" style="flex:1; margin:0;">
+        <label>메모</label>
+        <input type="text" id="f_memo" placeholder="특이사항 (예: 반려동물, 재시공 등)">
+      </div>
+      <button class="btn-add" style="width:140px; margin-top:20px;" onclick="addEntry()">추가 ➕</button>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-card">
+    <div class="table-header">
+      <div class="table-title">📋 신청자 목록</div>
+      <div style="font-size:0.78rem; color:var(--text-muted);">짝궁 할인이 자동 반영됩니다</div>
+    </div>
+    <div id="tableBody">
+      <div class="empty-state">
+        <div class="icon">🏘️</div>
+        <p>위 폼에서 신청자를 추가해 주세요</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTE -->
+  <div class="note-area">
+    <label>📝 공구 메모 / 특이사항</label>
+    <textarea id="gongguNote" rows="3" placeholder="공구 진행 관련 특이사항, 안내사항 등을 기록하세요..." oninput="saveSetup()"></textarea>
+  </div>
+
+  <!-- CONTRACT TERMS (For Print / HTML Export) -->
+  <div class="terms-section print-only" style="margin-top: 40px; padding-top: 30px; border-top: 2px solid var(--border);">
+    <h3 style="font-size: 1.2rem; margin-bottom: 20px; color: var(--text); font-weight: 800; text-align: center;">
+      <span style="border-bottom: 3px solid var(--primary); padding-bottom: 5px;">시공 및 유지관리 주요 수칙</span>
+    </h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-bottom: 30px;">
+      <div style="padding: 12px; background: #fdfdfd; border-radius: 8px; border-left: 3px solid var(--primary); font-size: 0.85rem;"><strong style="color: var(--primary);">01. 고온 주의:</strong> 스팀 청소기 사용 금지, 직사광선 노출 최소화.</div>
+      <div style="padding: 12px; background: #fdfdfd; border-radius: 8px; border-left: 3px solid var(--primary); font-size: 0.85rem;"><strong style="color: var(--primary);">02. 습기 관리:</strong> 액체 주입 시 즉시 건조, 환기 필수.</div>
+      <div style="padding: 12px; background: #fdfdfd; border-radius: 8px; border-left: 3px solid var(--primary); font-size: 0.85rem;"><strong style="color: var(--primary);">03. 중량물 주의:</strong> 무거운 가구 장기 방치 시 복원 방해 가능성.</div>
+      <div style="padding: 12px; background: #fdfdfd; border-radius: 8px; border-left: 3px solid var(--primary); font-size: 0.85rem;"><strong style="color: var(--primary);">04. 오염 방지:</strong> 유성매직, 색소 강한 음식물 영구 이염 주의.</div>
+      <div style="padding: 12px; background: #fdfdfd; border-radius: 8px; border-left: 3px solid var(--primary); font-size: 0.85rem;"><strong style="color: var(--primary);">05. 스크래치 유의:</strong> 날카로운 물체 및 반려동물의 발톱 주의.</div>
+      <div style="padding: 12px; background: #fdfdfd; border-radius: 8px; border-left: 3px solid var(--primary); font-size: 0.85rem;"><strong style="color: var(--primary);">06. 자연 현상:</strong> 필름 기포/주름은 공법상 무상 AS 대상 제외.</div>
+    </div>
+
+    <h3 style="font-size: 1.2rem; color: var(--text); font-weight: 800; margin-bottom: 20px; text-align: center;">📑 시공 서비스 표준 계약 및 A/S 규정</h3>
+    <div style="background: #F8FAFC; border: 1px solid var(--border); border-radius: 12px; padding: 20px; font-size: 0.85rem; color: #333; line-height: 1.7;">
+      <p style="margin-top:0;"><strong>제 1조 (시공 및 정산)</strong> 본 시공은 정품 TPU 매트를 사용하며, 최종 대금은 시공 완료 후 실제 현장에서 사용된 확정 수량을 기준으로 정산함을 원칙으로 합니다. (환산 수량은 예상치이며 변수가 있을 수 있습니다.)</p>
+      <p><strong>제 2조 (품질 보장 및 오차)</strong> 품질 편차는 ±3cm 이내를 정상 범위로 간주하며, 시공 불량(7일), 제품 결함(90일) 보장을 원칙으로 합니다. 사계절 황변 또는 기포 발생은 자연스러운 물리 반응으로 처리됩니다.</p>
+      <p><strong>제 3조 (이용 수칙 및 해약)</strong> 스팀 청소기 등 고온 노출 금지. 재단 시작 후 또는 현장 변심에 의한 해약 시 발생 비용 전액이 고객에게 청구됩니다.</p>
+      <p style="margin-bottom:0; color:#e67e22;"><strong>※ 후기할인 조건 안내:</strong> 조건으로 진행하신 고객분은 약속 기한 내 후기 미작성 시 할인 혜택이 회수 청구됩니다.</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM SUMMARY -->
+<div class="summary-footer">
+  <div class="summary-items">
+    <div class="summary-item">
+      <div class="s-value" id="fs_apt">—</div>
+      <div class="s-label">아파트</div>
+    </div>
+    <div class="s-divider"></div>
+    <div class="summary-item">
+      <div class="s-value" id="fs_count">0세대</div>
+      <div class="s-label">참여 세대</div>
+    </div>
+    <div class="s-divider"></div>
+    <div class="summary-item">
+      <div class="s-value" id="fs_tier">기본가</div>
+      <div class="s-label">현재 티어</div>
+    </div>
+    <div class="s-divider"></div>
+    <div class="summary-item">
+      <div class="s-value" id="fs_total">0원</div>
+      <div class="s-label">총 합계</div>
+    </div>
+  </div>
+  <div style="display:flex; gap:10px;">
+    <button class="btn-export" style="background:#10B981;" onclick="openEmailModal()">✉️ 이메일 전송</button>
+    <button class="btn-export" style="background:#475569;" onclick="downloadHTML()">💾 HTML 저장</button>
+    <button class="btn-export" onclick="window.print()">🖨️ 공구 현황 인쇄</button>
+  </div>
+</div>
+
+<!-- EMAIL MODAL -->
+<div id="emailModal" class="no-print" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:10000; align-items:center; justify-content:center; padding:20px;">
+  <div style="background:white; width:100%; max-width:560px; border-radius:24px; padding:32px; box-shadow:var(--shadow);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+      <div>
+        <h3 style="margin:0; font-size:1.2rem; font-weight:800; color:var(--text);">📧 이메일로 현황판 전송</h3>
+        <p style="margin:4px 0 0; font-size:0.8rem; color:var(--text-muted);">이메일 앱을 열고 HTML 현황판을 첨부하세요</p>
+      </div>
+      <button onclick="document.getElementById('emailModal').style.display='none'" style="border:none; background:#F1F5F9; border-radius:50%; width:36px; height:36px; font-size:1.1rem; cursor:pointer;">✕</button>
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <label style="font-weight:700; font-size:0.85rem; color:var(--text); display:block; margin-bottom:6px;">📨 받는 사람</label>
+      <input type="email" id="emailTo" placeholder="받는 분의 이메일" style="width:100%; padding:12px; border:1px solid var(--border); border-radius:12px; font-size:0.95rem; outline:none; font-family:inherit;">
+    </div>
+    <div style="margin-bottom:16px;">
+      <label style="font-weight:700; font-size:0.85rem; color:var(--text); display:block; margin-bottom:6px;">📌 이메일 제목</label>
+      <input type="text" id="emailSubject" style="width:100%; padding:12px; border:1px solid var(--border); border-radius:12px; font-size:0.95rem; outline:none; font-family:inherit;">
+    </div>
+    <div style="margin-bottom:20px;">
+      <label style="font-weight:700; font-size:0.85rem; color:var(--text); display:block; margin-bottom:6px;">📝 이메일 본문</label>
+      <textarea id="emailBody" rows="6" style="width:100%; padding:12px; border:1px solid var(--border); border-radius:12px; font-size:0.88rem; resize:vertical; outline:none; font-family:inherit;"></textarea>
+    </div>
+
+    <div style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:12px; padding:12px 16px; margin-bottom:20px; font-size:0.82rem; color:#166534; display:flex; gap:10px;">
+      <span style="font-size:1.4rem;">📎</span>
+      <div>
+        <strong>HTML 파일이 자동 다운로드됩니다.</strong><br>
+        이메일 앱이 열리면 다운로드된 HTML 파일을 <b>직접 첨부</b>해 주세요.
+      </div>
+    </div>
+    
+    <button onclick="sendEmail()" style="width:100%; padding:14px; background:linear-gradient(135deg, var(--sky), var(--sky-dark)); border:none; border-radius:12px; cursor:pointer; font-size:0.95rem; font-weight:700; color:white;">✉️ 이메일 앱 열고 전송하기</button>
+  </div>
+</div>
+
+<script>
+  // === DATA ===
+  const BASE_PRICES = {
+    '600_std': 25000,
+    '600_lea': 29000,
+    '800_std': 47000,
+    '800_lea': 60000,
+    '1000_lea': 95000,
+    '1200_lea': 150000
+  };
+  const SPEC_LABELS = {
+    '600_std': '600mm',
+    '600_lea': '600mm 레더',
+    '800_std': '800mm',
+    '800_lea': '800mm 레더',
+    '1000_lea': '1000mm 레더',
+    '1200_lea': '1200mm 레더'
+  };
+  const PYEONG_QTY_600 = {
+    '24_hall': 70, '24_full': 85,
+    '34_hall': 85, '34_full': 110,
+    '40_hall': 110, '40_full': 140
+  };
+  const SPEC_RATIO = {
+    '600_std': 1, '600_lea': 1,
+    '800_std': 0.56, '800_lea': 0.56,
+    '1000_lea': 0.36, '1200_lea': 0.25
+  };
+  const TIER_DISCOUNTS = [
+    { min: 0,  discount: 0,    label: '기본가' },
+    { min: 2,  discount: 500,  label: '2세대 (-500원)' },
+    { min: 3,  discount: 1000, label: '3세대 (-1,000원)' },
+    { min: 7,  discount: 1500, label: '7세대 (-1,500원)' },
+    { min: 10, discount: 2000, label: '10세대+ (-2,000원)' }
+  ];
+
+  let entries = JSON.parse(localStorage.getItem('gg_entries') || '[]');
+  let activeChips = new Set();
+
+  function getCurrentTier(count) {
+    let tier = TIER_DISCOUNTS[0];
+    for (const t of TIER_DISCOUNTS) {
+      if (count >= t.min) tier = t;
+    }
+    return tier;
+  }
+
+  function getNextTier(count) {
+    for (const t of TIER_DISCOUNTS) {
+      if (t.min > count) return t;
+    }
+    return null;
+  }
+
+  function calcEntryTotal(e, tierDiscount) {
+    let appliedTierDiscount = tierDiscount;
+    if (e.chips.includes('welfare') || e.chips.includes('refer')) {
+      appliedTierDiscount = 0;
+    }
+    let pricePerMat = BASE_PRICES[e.spec] - appliedTierDiscount;
+    if (e.chips.includes('review1')) pricePerMat -= 1000;
+    if (e.chips.includes('welfare')) pricePerMat -= 500;
+    let total = pricePerMat * e.qty;
+    if (e.chips.includes('review2')) total -= 30000;
+    if (e.chips.includes('refer')) total -= 50000;
+    if (e.chips.includes('regional')) total += 100000;
+    return Math.max(total, 0);
+  }
+
+  function toggleChip(id) {
+    const el = document.getElementById('chip_' + id);
+    if (activeChips.has(id)) {
+      activeChips.delete(id);
+      el.classList.remove('active');
+    } else {
+      activeChips.add(id);
+      el.classList.add('active');
+    }
+  }
+
+  function autoFillQty() {
+    const pyeong = document.getElementById('f_pyeong').value;
+    const spec = document.getElementById('f_spec').value;
+    if (!pyeong) return;
+    const base600 = PYEONG_QTY_600[pyeong] || 0;
+    const ratio = SPEC_RATIO[spec] || 1;
+    const qty = Math.ceil(base600 * ratio) + 10; // +10 여유수량
+    document.getElementById('f_qty').value = qty;
+  }
+
+  function addEntry() {
+    const name = document.getElementById('f_name').value.trim();
+    const phone = document.getElementById('f_phone').value.trim();
+    const unit = document.getElementById('f_unit').value.trim();
+    const pyeong = document.getElementById('f_pyeong').value;
+    const spec = document.getElementById('f_spec').value;
+    const qty = parseInt(document.getElementById('f_qty').value);
+    const memo = document.getElementById('f_memo').value.trim();
+
+    if (!name) { alert('고객명을 입력해주세요.'); return; }
+    if (!qty || qty < 1) { alert('수량을 입력해주세요.'); return; }
+
+    const pyeongLabels = {
+      '24_hall':'24평 거실복도','24_full':'24평 거복주',
+      '34_hall':'34평 거실복도','34_full':'34평 거복주',
+      '40_hall':'40평 거실복도','40_full':'40평 거실복도주방'
+    };
+
+    const entry = {
+      id: Date.now(),
+      name, phone, unit,
+      pyeong: pyeong ? (pyeongLabels[pyeong] || pyeong) : '직접입력',
+      spec, qty, memo,
+      chips: Array.from(activeChips)
+    };
+
+    entries.push(entry);
+    saveEntries();
+    renderAll();
+
+    // Reset
+    document.getElementById('f_name').value = '';
+    document.getElementById('f_phone').value = '';
+    document.getElementById('f_unit').value = '';
+    document.getElementById('f_pyeong').value = '';
+    document.getElementById('f_qty').value = '';
+    document.getElementById('f_memo').value = '';
+    activeChips.clear();
+    document.querySelectorAll('.d-chip').forEach(c => c.classList.remove('active'));
+  }
+
+  function deleteEntry(id) {
+    if (!confirm('이 신청자를 삭제할까요?')) return;
+    entries = entries.filter(e => e.id !== id);
+    saveEntries();
+    renderAll();
+  }
+
+  function saveEntries() {
+    localStorage.setItem('gg_entries', JSON.stringify(entries));
+  }
+
+  function saveSetup() {
+    localStorage.setItem('gg_setup', JSON.stringify({
+      aptName: document.getElementById('aptName').value,
+      aptLocation: document.getElementById('aptLocation').value,
+      startDate: document.getElementById('startDate').value,
+      endDate: document.getElementById('endDate').value,
+      note: document.getElementById('gongguNote').value
+    }));
+    renderAll();
+  }
+
+  function loadSetup() {
+    const s = JSON.parse(localStorage.getItem('gg_setup') || '{}');
+    if (s.aptName) document.getElementById('aptName').value = s.aptName;
+    if (s.aptLocation) document.getElementById('aptLocation').value = s.aptLocation;
+    if (s.startDate) document.getElementById('startDate').value = s.startDate;
+    if (s.endDate) document.getElementById('endDate').value = s.endDate;
+    if (s.note) document.getElementById('gongguNote').value = s.note;
+  }
+
+  function fmt(n) { return n.toLocaleString('ko-KR') + '원'; }
+
+  function renderAll() {
+    const count = entries.length;
+    const tier = getCurrentTier(count);
+    const tierDiscount = tier.discount;
+
+    // Tier nodes
+    const nodes = ['tn0','tn2','tn3','tn7','tn10'];
+    const mins = [0, 2, 3, 7, 10];
+    nodes.forEach((id, i) => {
+      const el = document.getElementById(id);
+      el.classList.remove('active','current');
+      if (count >= mins[i]) {
+        if (i === mins.length - 1 || count < mins[i+1]) {
+          el.classList.add('current');
+        } else {
+          el.classList.add('active');
+        }
+      }
+    });
+
+    // Badge
+    document.getElementById('currentTierBadge').textContent =
+      count + '세대 — ' + (tierDiscount > 0 ? '-' + tierDiscount.toLocaleString() + '원/장' : '기본가');
+
+    // Next tier hint
+    const next = getNextTier(count);
+    const hint = document.getElementById('nextTierHint');
+    if (next) {
+      hint.innerHTML = `<div class="next-tier-hint">
+        <span class="nt-icon">🎯</span>
+        <p><strong>${next.min - count}세대</strong> 더 모이면 <strong>${next.label}</strong> 달성! 장당 <strong>${next.discount.toLocaleString()}원</strong> 추가 할인이 적용됩니다.</p>
+      </div>`;
+    } else {
+      hint.innerHTML = `<div class="next-tier-hint" style="background:linear-gradient(135deg,#D1FAE5,#A7F3D0);border-color:#6EE7B7;">
+        <span class="nt-icon">🏆</span>
+        <p><strong>최고 할인 티어 달성!</strong> 장당 2,000원 최대 할인이 적용되고 있습니다.</p>
+      </div>`;
+    }
+
+    // Stats
+    const totalMats = entries.reduce((s, e) => s + e.qty, 0);
+    const totalAmt = entries.reduce((s, e) => s + calcEntryTotal(e, tierDiscount), 0);
+    const avg = count > 0 ? Math.round(totalAmt / count) : 0;
+
+    document.getElementById('statTotal').textContent = count;
+    document.getElementById('statMats').textContent = totalMats.toLocaleString();
+    document.getElementById('statDiscount').textContent = tierDiscount > 0 ? '-' + tierDiscount.toLocaleString() + '원/장' : '0원';
+    document.getElementById('statTotal2').textContent = count > 0 ? Math.round(totalAmt/10000) + '만원' : '—';
+    document.getElementById('statAvg').textContent = count > 0 ? Math.round(avg/10000) + '만원' : '—';
+
+    // Footer
+    const aptName = document.getElementById('aptName').value || '아파트명 미설정';
+    document.getElementById('fs_apt').textContent = aptName;
+    document.getElementById('fs_count').textContent = count + '세대';
+    document.getElementById('fs_tier').textContent = tier.label;
+    document.getElementById('fs_total').textContent = count > 0 ? fmt(totalAmt) : '0원';
+
+    // Table
+    const tbody = document.getElementById('tableBody');
+    if (entries.length === 0) {
+      tbody.innerHTML = `<div class="empty-state"><div class="icon">🏘️</div><p>위 폼에서 신청자를 추가해 주세요</p></div>`;
+      return;
+    }
+
+    const chipLabels = {
+      review1: '후기2곳-1천/장', review2: '후기추가-3만', welfare: '우대-5백/장', refer: '소개-5만', regional: '지방+10만'
+    };
+
+    let html = `<table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>고객명</th>
+          <th>연락처</th>
+          <th>동/호수</th>
+          <th>평형</th>
+          <th>규격</th>
+          <th style="text-align:center">수량</th>
+          <th>단가</th>
+          <th>추가 할인</th>
+          <th style="text-align:right">합계</th>
+          <th class="no-print"></th>
+        </tr>
+      </thead>
+      <tbody>`;
+
+    entries.forEach((e, i) => {
+      const isLeather = e.spec.includes('lea');
+      let appliedTierDiscount = tierDiscount;
+      const hasExclusion = e.chips.includes('welfare') || e.chips.includes('refer');
+      if (hasExclusion) {
+        appliedTierDiscount = 0;
+      }
+      const unitPrice = BASE_PRICES[e.spec] - appliedTierDiscount;
+      const total = calcEntryTotal(e, tierDiscount);
+      const tags = e.chips.map(c => `<div class="dtag">${chipLabels[c]||c}</div>`).join('');
+      const exclusionNote = (hasExclusion && tierDiscount > 0) ? `<br><small style="color:var(--red);font-size:0.65rem;">짝궁할인 제외</small>` : '';
+      html += `<tr>
+        <td><div class="num-badge">${i+1}</div></td>
+        <td><strong>${e.name}</strong>${e.memo ? `<br><small style="color:var(--text-muted)">${e.memo}</small>` : ''}${exclusionNote}</td>
+        <td style="color:var(--text-muted); font-size:0.82rem">${e.phone||'—'}</td>
+        <td style="font-size:0.82rem">${e.unit||'—'}</td>
+        <td style="font-size:0.82rem">${e.pyeong}</td>
+        <td><span class="spec-tag ${isLeather?'leather':''}">${SPEC_LABELS[e.spec]}</span></td>
+        <td style="text-align:center; font-weight:700">${e.qty}장</td>
+        <td class="price-cell">${unitPrice.toLocaleString()}원</td>
+        <td><div class="discount-tags">${tags||'없음'}</div></td>
+        <td style="text-align:right" class="total-cell">${fmt(total)}</td>
+        <td class="no-print"><button class="del-btn" onclick="deleteEntry(${e.id})">✕</button></td>
+      </tr>`;
+    });
+
+    html += `</tbody>
+      <tfoot>
+        <tr style="background:#F8FAFC; border-top:2px solid var(--border)">
+          <td colspan="6" style="padding:16px; font-weight:800; color:var(--text); font-size:0.9rem">합계</td>
+          <td style="text-align:center; font-weight:800; padding:16px">${totalMats.toLocaleString()}장</td>
+          <td colspan="2" style="padding:16px; font-size:0.78rem; color:var(--sky-dark); font-weight:700">짝궁할인 ${tierDiscount.toLocaleString()}원/장 적용</td>
+          <td style="text-align:right; font-weight:900; font-size:1.05rem; padding:16px; color:var(--sky-dark)">${fmt(totalAmt)}</td>
+          <td class="no-print"></td>
+        </tr>
+      </tfoot>
+    </table>`;
+
+    tbody.innerHTML = html;
+  }
+
+  // CALCULATOR LOGIC
+  let spaces = [{ id: 1, type: '거실', w: '', h: '' }];
+  function addSpaceRow() {
+    spaces.push({ id: Date.now(), type: '추가공간', w: '', h: '' });
+    renderSpaces();
+  }
+  function removeSpaceRow(id) {
+    spaces = spaces.filter(s => s.id !== id);
+    renderSpaces();
+    calculateArea();
+  }
+  function updateSpace(id, field, value) {
+    const s = spaces.find(x => x.id === id);
+    if(s) s[field] = value;
+    calculateArea();
+  }
+  function renderSpaces() {
+    const container = document.getElementById('spaceInputsContainer');
+    container.innerHTML = spaces.map(s => `
+      <div class="space-row">
+        <div class="form-group">
+          <label>공간 구분</label>
+          <input type="text" value="${s.type}" onchange="updateSpace(${s.id}, 'type', this.value)" placeholder="예: 거실, 복도">
+        </div>
+        <div class="form-group">
+          <label>가로 (cm)</label>
+          <input type="number" value="${s.w}" oninput="updateSpace(${s.id}, 'w', this.value)" placeholder="예: 400">
+        </div>
+        <div class="form-group">
+          <label>세로 (cm)</label>
+          <input type="number" value="${s.h}" oninput="updateSpace(${s.id}, 'h', this.value)" placeholder="예: 300">
+        </div>
+        <button class="btn-remove-space" onclick="removeSpaceRow(${s.id})">✕</button>
+      </div>
+    `).join('');
+  }
+  function calculateArea() {
+    let totalAreaSqCm = 0;
+    spaces.forEach(s => {
+      const w = parseFloat(s.w) || 0;
+      const h = parseFloat(s.h) || 0;
+      totalAreaSqCm += (w * h);
+    });
+    const m2 = totalAreaSqCm / 10000;
+    document.getElementById('resArea').innerHTML = m2.toFixed(2) + ' <span style="font-size:0.8rem">m²</span>';
+    if (totalAreaSqCm > 0) {
+      document.getElementById('res600').textContent = Math.ceil(totalAreaSqCm / 3600) + 10;
+      document.getElementById('res800').textContent = Math.ceil(totalAreaSqCm / 6400) + 6;
+      document.getElementById('res1000').textContent = Math.ceil(totalAreaSqCm / 10000) + 5;
+      document.getElementById('res1200').textContent = Math.ceil(totalAreaSqCm / 14400) + 4;
+    } else {
+      ['res600','res800','res1000','res1200'].forEach(id => document.getElementById(id).textContent = '0');
+    }
+  }
+  function copyCalcToForm() {
+    const spec = document.getElementById('f_spec').value;
+    let targetId = 'res600';
+    if(spec.includes('800')) targetId = 'res800';
+    if(spec.includes('1000')) targetId = 'res1000';
+    if(spec.includes('1200')) targetId = 'res1200';
+    const qty = document.getElementById(targetId).textContent;
+    if(qty && qty !== '0') {
+      document.getElementById('f_qty').value = qty;
+      document.getElementById('f_pyeong').value = '';
+      alert(`복사 완료! 아래 신청자 추가 폼의 '수량'란에 ${qty}장이 자동 입력되었습니다.`);
+    } else {
+      alert("먼저 가로, 세로 길이를 입력해 면적을 계산해주세요.");
+    }
+  }
+  function saveSpacesPreset() {
+    const type = document.getElementById('presetToSave').value;
+    if(!type) return;
+    localStorage.setItem('gg_preset_' + type, JSON.stringify(spaces));
+    alert(`${type}타입 공간 구성이 저장되었습니다!`);
+  }
+  function loadSpacesPreset(type) {
+    const data = localStorage.getItem('gg_preset_' + type);
+    if(data) {
+      spaces = JSON.parse(data);
+      renderSpaces();
+      calculateArea();
+      alert(`${type}타입 공간 구성을 불러왔습니다.`);
+    } else {
+      alert(`저장된 ${type}타입 정보가 없습니다. 우측 도구에서 공간을 먼저 저장해주세요.`);
+    }
+  }
+  function openEmailModal() {
+    const aptName = document.getElementById('aptName').value || '아파트';
+    const totalCount = entries.length;
+    
+    document.getElementById('emailSubject').value = `[하늘매트] ${aptName} 공동구매 진행 현황`;
+    document.getElementById('emailBody').value = `안녕하세요,\n\n요청하신 '${aptName}' 하늘매트 공동구매 진행 현황 브리핑입니다.\n\n현재 총 ${totalCount}세대가 참여 중이며, 상세 현황은 첨부된 HTML 파일을 브라우저로 열어 확인해 주시기 바랍니다.\n\n감사합니다.`;
+    
+    document.getElementById('emailModal').style.display = 'flex';
+  }
+  function sendEmail() {
+    downloadHTML(); // HTML 자동 다운로드
+    
+    const to = document.getElementById('emailTo').value;
+    const subject = encodeURIComponent(document.getElementById('emailSubject').value);
+    const body = encodeURIComponent(document.getElementById('emailBody').value);
+    
+    setTimeout(() => {
+      window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+      document.getElementById('emailModal').style.display = 'none';
+    }, 500);
+  }
+
+  function downloadHTML() {
+    const htmlContent = document.documentElement.outerHTML;
+    const blob = new Blob(['<!DOCTYPE html>\n' + htmlContent], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const aptName = document.getElementById('aptName').value || '아파트';
+    const filename = `${aptName}_공구현황.html`;
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // INIT
+  loadSetup();
+  // Set today as default start date
+  const today = new Date().toISOString().split('T')[0];
+  if (!document.getElementById('startDate').value) document.getElementById('startDate').value = today;
+  renderSpaces();
+  calculateArea();
+  renderAll();
+</script>
+</body>
+</html>

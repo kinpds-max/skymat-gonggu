@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>하스놀 AI맞춤 견적시스템</title>
+  <meta name="description" content="HASNOL 프리미엄 바닥매트 시공 상세견적 및 전자 계약 시스템">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Noto+Sans+KR:wght@300;500;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/lucide-static@0.2.0/lib/index.min.js"></script>
+  <!-- PDF Generation Dependencies -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+<body>
+  <div class="container">
+
+    <header
+      style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 2px solid var(--primary); padding-bottom: 25px;">
+      <div>
+        <h1
+          style="color: var(--primary); margin: 0; font-size: 2.2rem; letter-spacing: -0.05em; font-weight: 800; border-bottom: none; text-align: left;">
+          HASNOL <span style="font-weight: 300; color: var(--text-main);">ESTIMATE</span></h1>
+        <p style="margin: 5px 0 0 0; color: var(--text-muted); font-size: 0.95rem; font-weight: 500;">프리미엄 TPU 바닥매트 맞춤
+          견적 시스템</p>
+      </div>
+      <div style="text-align: right;">
+        <div
+          style="background: var(--primary); color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: inline-block; margin-bottom: 8px;">
+          CORPORATE HOTLINE</div>
+        <p style="margin: 0; font-size: 1.25rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.02em;">☎
+          1660-1195</p>
+      </div>
+    </header>
+
+
+    <div class="form-group no-print" style="margin-bottom: 25px; max-width: 250px;">
+      <label style="font-weight: 800; color: var(--primary); font-size: 0.85rem; margin-bottom: 8px; display: block;">📂 견적 발행 일자</label>
+      <input type="date" id="estimateDate" style="border-radius: 10px; padding: 12px; width: 100%; border: 1.5px solid var(--primary-light); font-weight: 600; color: var(--text-main); background: #f8faff;">
+    </div>
+
+    <div class="grid-layout">
+      <!-- Input Section -->
+      <section class="card animate-in">
+        <h2 style="margin-bottom: 25px;"><i data-lucide="calculator"></i> 견적 입력</h2>
+
+        <div class="cust-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; background: #f8faff; padding: 20px; border-radius: 12px; border: 1px solid #eef2ff;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="customerName" style="font-size: 0.85rem;">고객명</label>
+            <input type="text" id="customerName" placeholder="예: 홍길동">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="customerPhone" style="font-size: 0.85rem;">고객번호</label>
+            <input type="text" id="customerPhone" placeholder="예: 010-1234-5678">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="customerEmail" style="font-size: 0.85rem;">📧 고객 이메일</label>
+            <input type="email" id="customerEmail" placeholder="예: customer@email.com">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="customerRegion" style="font-size: 0.85rem;">지역</label>
+            <input type="text" id="customerRegion" placeholder="예: 서울 강남구">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="customerApt" style="font-size: 0.85rem;">시설/아파트명</label>
+            <input type="text" id="customerApt" placeholder="예: 힐스테이트 1단지">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="customerSize" style="font-size: 0.85rem;">평형</label>
+            <input type="text" id="customerSize" placeholder="예: 34평">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="customerScope" style="font-size: 0.85rem;">시공 범위</label>
+            <input type="text" id="customerScope" placeholder="예: 거실+복도+주방">
+          </div>
+          <div class="form-group" style="grid-column: 1 / -1; margin-bottom: 0; margin-top: 5px;">
+            <label for="customerTendency" style="font-size: 0.85rem; color: var(--primary); font-weight: 800;">💡 고객 성향 (최적 추천 AI 반영)</label>
+            <select id="customerTendency" style="width: 100%; padding: 12px; border-radius: 8px; border: 1.5px solid var(--primary-light); font-weight: 500;">
+              <option value="balanced">기본 (가성비 및 퀄리티 균형)</option>
+              <option value="budget">싼 가격 선호 (가장 저렴한 600 규격 추천)</option>
+              <option value="premium">프리미엄 선호 (고급형 1000/800 레더 추천)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 15px;">
+          <label style="font-weight: 700; color: var(--primary);">🏠 일반적 수량 안내칸</label>
+          <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <label class="preset-chip active"><input type="radio" name="facilityType" value="home" checked
+                style="display:none;"> 가정집</label>
+            <label class="preset-chip"><input type="radio" name="facilityType" value="other" style="display:none;"> 기타
+              시설</label>
+          </div>
+
+          <div id="homePresets"
+            style="background: #fcfdfe; border: 1px solid #eef2ff; padding: 15px; border-radius: 12px; display: block;">
+            <p
+              style="font-size: 0.8rem; color: var(--primary); font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 5px;">
+              <i data-lucide="info" style="width:14px;"></i> 시설별 표준 시공 가이드 (600mm 기준 자동 환산)</p>
+
+            <div id="residentialGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <!-- 24 Pyeong -->
+              <button class="preset-btn" data-qty="70" data-desc="24평 거복">24평 거실복도</button>
+              <button class="preset-btn" data-qty="85" data-desc="24평 거복주">24평 거복주</button>
+              <!-- 34 Pyeong -->
+              <button class="preset-btn" data-qty="85" data-desc="34평 거복">34평 거실복도</button>
+              <button class="preset-btn" data-qty="110" data-desc="34평 거복주">34평 거복주</button>
+              <!-- 40 Pyeong -->
+              <button class="preset-btn" data-qty="110" data-desc="40평 거복">40평 거실복도</button>
+              <button class="preset-btn" data-qty="140" data-desc="40평 거복주">40평 거실복도주방</button>
+            </div>
+            
+            <p style="font-size: 0.75rem; color: #666; margin-top: 12px; line-height: 1.4;">
+              * <strong>결과값 안내:</strong> 일반 안내칸 선택 시 우측 AI 매트릭스에 <strong style="color:var(--primary);">[해당 평면 실수량 카운터 + 여유수량 10장]</strong>이 포함된 최종 보수 장수로 자동 계산되어 출력됩니다.
+            </p>
+
+            <div id="commercialGrid"
+              style="display: none; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px;">
+              <button class="preset-btn" data-qty="200" data-desc="어린이집">어린이집</button>
+              <button class="preset-btn" data-qty="150" data-desc="병원">병원</button>
+              <button class="preset-btn" data-qty="300" data-desc="호텔">호텔</button>
+              <button class="preset-btn" data-qty="250" data-desc="키즈카페">키즈카페</button>
+              <button class="preset-btn" data-qty="400" data-desc="교회">교회</button>
+            </div>
+
+            <p style="margin-top: 10px; font-size: 0.75rem; color: #8e8e93;">* 선택 시 600mm 기준 수량이 적용되며, 타 규격 선택 시 자동
+              환산(800:56%, 1000:36%, 1200:25%)됩니다.</p>
+          </div>
+        </div>
+
+        <!-- Professional Recommendation Chips -->
+
+        <!-- Spaces Container -->
+        <div id="spacesContainer">
+          <div class="space-item card"
+            style="padding: 20px; background: #fff; border: 1px solid #eee; margin-bottom: 15px; position: relative;">
+            <div class="space-inner-grid" style="display: grid; grid-template-columns: 140px 1fr 1fr; gap: 15px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label>공간 구분</label>
+                <select class="space-type" onchange="toggleCustomSpace(this)">
+                  <option value="living">거실</option>
+                  <option value="hallway">복도</option>
+                  <option value="kitchen">주방</option>
+                  <option value="room1">방 1</option>
+                  <option value="room2">방 2</option>
+                  <option value="room3">방 3</option>
+                  <option value="room4">방 4</option>
+                  <option value="alpha">알파룸</option>
+                  <option value="etc">직접 입력 (기타)</option>
+                </select>
+                <input type="text" class="custom-space-name" placeholder="공간명 직접 입력 (예: 펫룸, 펜트하우스)"
+                  style="display: none; margin-top: 10px; font-size: 0.9rem; padding: 10px 14px; border: 1.5px solid var(--primary); border-radius: 10px; box-shadow: 0 0 10px rgba(10, 84, 247, 0.1); width: calc(100% - 28px);">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label>가로 (cm)</label>
+                <input type="number" class="space-width" placeholder="예: 400">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label>세로 (cm)</label>
+                <input type="number" class="space-height" placeholder="예: 300">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-secondary" id="addSpaceBtn"
+          style="width: 100%; margin-bottom: 25px; border-style: dashed; background: transparent; color: var(--primary);">
+          <span style="font-size: 1.2rem; margin-right: 8px;">➕</span> 시공 공간 추가하기
+        </button>
+
+        <div style="margin-bottom: 35px; border-top: 1px solid var(--border-color); padding-top: 30px;">
+          <div class="discount-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <label style="font-weight: 700; color: var(--text-main); font-size: 1.1rem; margin-bottom: 0;">
+              <i data-lucide="settings-2"></i> 규격별 특가 및 추가 할인 관리
+            </label>
+            
+            <!-- Relocated Quick Select Chips -->
+            <div style="display: flex; gap: 8px;">
+               <div class="recommend-chip" onclick="selectModel('800', 'leather')" style="padding: 6px 14px; font-size: 0.8rem;">
+                <span style="background: #ffcc00; color: #000; font-size: 0.65rem; border-radius: 4px; padding: 1px 5px; margin-right: 5px; font-weight: 800;">BEST</span>
+                800 레더
+              </div>
+              <div class="recommend-chip" onclick="selectModel('1000', 'leather')" style="padding: 6px 14px; font-size: 0.8rem;">
+                <span style="background: var(--primary); color: #fff; font-size: 0.65rem; border-radius: 4px; padding: 1px 5px; margin-right: 5px; font-weight: 800;">PREMIUM</span>
+                1000 레더
+              </div>
+            </div>
+          </div>
+
+          <!-- Hidden inputs kept to prevent JS breakage -->
+          <input type="hidden" id="matSize" value="600">
+          <input type="hidden" id="matType" value="standard">
+
+          <!-- Pricing Control Table -->
+          <div class="pricing-table-wrap">
+          <div
+            style="width: 100%; border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; background: #fff; box-shadow: var(--shadow-soft);">
+            <div
+              style="display: grid; grid-template-columns: 160px 1fr 1.2fr 1fr; background: #fcfdfe; border-bottom: 2px solid #eef2ff; padding: 15px 20px; font-size: 0.8rem; font-weight: 800; color: var(--primary); align-items: center;">
+              <div>매트 규격</div>
+              <div>기초 단가</div>
+              <div>특별 추가 할인</div>
+              <div style="text-align: right;">공구/세트 단가</div>
+            </div>
+
+            <div id="pricingMatrixControls">
+              <!-- Row: 600 -->
+              <div
+                style="display: grid; grid-template-columns: 160px 1fr 1.2fr 1fr; padding: 18px 20px; border-bottom: 1px solid #f2f2f7; align-items: center;">
+                <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">600mm</div>
+                <div style="font-size: 0.9rem; color: #8e8e93;">29,000원</div>
+                <div style="display: flex; align-items: center; gap: 5px;">
+                  <input type="number" class="manual-discount" data-size="600" data-type="all" value="4000"
+                    style="padding: 10px 12px; font-size: 0.95rem; font-weight: 700; color: var(--primary); width: 100px; border-radius: 8px;">
+                  <span style="font-size: 0.8rem; color: #999;">원</span>
+                </div>
+                <div
+                  style="text-align: right; font-weight: 800; font-size: 1.15rem; color: var(--text-main); white-space: nowrap;">
+                  <span class="price-row-final" data-size="600" data-type="all">25,000</span><small
+                    style="font-size: 0.8rem; font-weight: 500; margin-left: 4px; color: #666;">원</small>
+                </div>
+              </div>
+              <!-- Row: 600 레더 -->
+              <div
+                style="display: grid; grid-template-columns: 160px 1fr 1.2fr 1fr; padding: 18px 20px; border-bottom: 1px solid #f2f2f7; align-items: center;">
+                <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">600mm <span style="font-size:0.7rem; background:#fff3e0; color:#e67e22; border-radius:4px; padding:1px 6px; margin-left:4px;">레더</span></div>
+                <div style="font-size: 0.9rem; color: #8e8e93;">33,000원</div>
+                <div style="display: flex; align-items: center; gap: 5px;">
+                  <input type="number" class="manual-discount" data-size="600" data-type="leather" value="4000"
+                    style="padding: 10px 12px; font-size: 0.95rem; font-weight: 700; color: var(--primary); width: 100px; border-radius: 8px;">
+                  <span style="font-size: 0.8rem; color: #999;">원</span>
+                </div>
+                <div
+                  style="text-align: right; font-weight: 800; font-size: 1.15rem; color: var(--text-main); white-space: nowrap;">
+                  <span class="price-row-final" data-size="600" data-type="leather">29,000</span><small
+                    style="font-size: 0.8rem; font-weight: 500; margin-left: 4px; color: #666;">원</small>
+                </div>
+              </div>
+              <!-- Row: 800 Std -->
+              <div
+                style="display: grid; grid-template-columns: 160px 1fr 1.2fr 1fr; padding: 18px 20px; border-bottom: 1px solid #f2f2f7; align-items: center;">
+                <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">800mm</div>
+                <div style="font-size: 0.9rem; color: #8e8e93;">80,000원</div>
+                <div style="display: flex; align-items: center; gap: 5px;">
+                  <input type="number" class="manual-discount" data-size="800" data-type="standard" value="33000"
+                    style="padding: 10px 12px; font-size: 0.95rem; font-weight: 700; color: var(--primary); width: 100px; border-radius: 8px;">
+                  <span style="font-size: 0.8rem; color: #999;">원</span>
+                </div>
+                <div
+                  style="text-align: right; font-weight: 800; font-size: 1.15rem; color: var(--text-main); white-space: nowrap;">
+                  <span class="price-row-final" data-size="800" data-type="standard">47,000</span><small
+                    style="font-size: 0.8rem; font-weight: 500; margin-left: 4px; color: #666;">원</small>
+                </div>
+              </div>
+              <!-- Row: 800 Leather -->
+              <div
+                style="display: grid; grid-template-columns: 160px 1fr 1.2fr 1fr; padding: 18px 20px; border-bottom: 1px solid #f2f2f7; align-items: center;">
+                <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">800mm 레더</div>
+                <div style="font-size: 0.9rem; color: #8e8e93;">90,000원</div>
+                <div style="display: flex; align-items: center; gap: 5px;">
+                  <input type="number" class="manual-discount" data-size="800" data-type="leather" value="30000"
+                    style="padding: 10px 12px; font-size: 0.95rem; font-weight: 700; color: var(--primary); width: 100px; border-radius: 8px;">
+                  <span style="font-size: 0.8rem; color: #999;">원</span>
+                </div>
+                <div
+                  style="text-align: right; font-weight: 800; font-size: 1.15rem; color: var(--text-main); white-space: nowrap;">
+                  <span class="price-row-final" data-size="800" data-type="leather">60,000</span><small
+                    style="font-size: 0.8rem; font-weight: 500; margin-left: 4px; color: #666;">원</small>
+                </div>
+              </div>
+              <!-- Row: 1000 Leather -->
+              <div
+                style="display: grid; grid-template-columns: 160px 1fr 1.2fr 1fr; padding: 18px 20px; border-bottom: 1px solid #f2f2f7; align-items: center;">
+                <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">1000mm 레더</div>
+                <div style="font-size: 0.9rem; color: #8e8e93;">130,000원</div>
+                <div style="display: flex; align-items: center; gap: 5px;">
+                  <input type="number" class="manual-discount" data-size="1000" data-type="leather" value="35000"
+                    style="padding: 10px 12px; font-size: 0.95rem; font-weight: 700; color: var(--primary); width: 100px; border-radius: 8px;">
+                  <span style="font-size: 0.8rem; color: #999;">원</span>
+                </div>
+                <div
+                  style="text-align: right; font-weight: 800; font-size: 1.15rem; color: var(--text-main); white-space: nowrap;">
+                  <span class="price-row-final" data-size="1000" data-type="leather">95,000</span><small
+                    style="font-size: 0.8rem; font-weight: 500; margin-left: 4px; color: #666;">원</small>
+                </div>
+              </div>
+              <!-- Row: 1200 Leather -->
+              <div
+                style="display: grid; grid-template-columns: 160px 1fr 1.2fr 1fr; padding: 18px 20px; align-items: center;">
+                <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">1200mm 레더</div>
+                <div style="font-size: 0.9rem; color: #8e8e93;">200,000원</div>
+                <div style="display: flex; align-items: center; gap: 5px;">
+                  <input type="number" class="manual-discount" data-size="1200" data-type="leather" value="50000"
+                    style="padding: 10px 12px; font-size: 0.95rem; font-weight: 700; color: var(--primary); width: 100px; border-radius: 8px;">
+                  <span style="font-size: 0.8rem; color: #999;">원</span>
+                </div>
+                <div
+                  style="text-align: right; font-weight: 800; font-size: 1.15rem; color: var(--text-main); white-space: nowrap;">
+                  <span class="price-row-final" data-size="1200" data-type="leather">150,000</span><small
+                    style="font-size: 0.8rem; font-weight: 500; margin-left: 4px; color: #666;">원</small>
+                </div>
+              </div>
+            </div>
+          </div>
+          </div><!-- /pricing-table-wrap -->
+
+          <div style="display: none;">
+            <input type="number" id="discountPerMat" value="0">
+            <input type="number" id="pricePerMat" value="0">
+          </div>
+        </div>
+
+        <div style="background: #f1f3f5; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+          <label style="margin-bottom: 12px; display: block; font-weight: 700; color: var(--primary);">🏢 시공 프로모션 및 특별
+            혜택</label>
+          <div class="promo-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label style="font-size: 0.8rem;">공동구매 및 짝궁 할인</label>
+              <select id="groupPurchaseTier" style="font-size: 0.85rem; padding: 8px;">
+                <option value="0">적용 안함</option>
+                <option value="500">2인 짝궁 (-500원/장)</option>
+                <option value="1000">3인 짝궁 (-1,000원/장)</option>
+                <option value="1500">7인 짝궁 (-1,500원/장)</option>
+                <option value="2000">10인 이상 (-2,000원/장)</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label style="font-size: 0.8rem;">추가 우대 및 리퍼 할인</label>
+              <select id="extraDiscountTier" style="font-size: 0.85rem; padding: 8px;">
+                <option value="0">없음</option>
+                <option value="500">우대 할인 (사회적 약자 / 다자녀 3인이상 등) (-500원/장)</option>
+                <option value="2000">리퍼 할인 (-2,000원/장, AS불가)</option>
+                <option value="4000">셀프 할인 (-4,000원/장, 배송비 50% 지원)</option>
+              </select>
+            </div>
+          </div>
+
+          <div
+            class="checkbox-row" style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px; padding-top: 15px; border-top: 1px solid #dee2e6;">
+            <label
+              style="display: flex; align-items: center; cursor: pointer; font-weight: normal; font-size: 0.85rem;">
+              <input type="checkbox" id="reviewCash" style="margin-right: 8px; width: 18px; height: 18px;"> 후기 2곳 현금할인
+              (-1,000원/장)
+            </label>
+            <label
+              style="display: flex; align-items: center; cursor: pointer; font-weight: normal; font-size: 0.85rem;">
+              <input type="checkbox" id="reviewEvent" style="margin-right: 8px; width: 18px; height: 18px;"> 추가 후기 2곳 할인
+              (-3만 원)
+            </label>
+            <label
+              style="display: flex; align-items: center; cursor: pointer; font-weight: normal; font-size: 0.85rem;">
+              <input type="checkbox" id="regionDelivery" style="margin-right: 8px; width: 18px; height: 18px;"> 지방/외곽
+              배송비 (+10만 원)
+            </label>
+            <label
+              style="display: flex; align-items: center; cursor: pointer; font-weight: normal; font-size: 0.85rem;">
+              <input type="checkbox" id="reinstallChk" style="margin-right: 8px; width: 18px; height: 18px;"> 재시공비
+              (+45만 원)
+            </label>
+          </div>
+
+          <div style="margin-top: 15px; display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 0.8rem;">소개 연결 (건당 5만원 할인):</span>
+            <input type="number" id="referralCount" value="0" min="0"
+              style="width: 50px; padding: 5px; border-radius: 6px;">
+            <span style="font-size: 0.75rem; color: #888;">* 짝궁공구와 중복불가</span>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" id="calculateBtn">
+          <span style="font-size: 1.2rem; margin-right: 8px;">✨</span> 즉시 견적 산출하기
+        </button>
+      </section>
+
+      <!-- Analysis & Comparison Dashboard -->
+      <section id="comparisonSection" class="animate-in" style="display: none; margin-bottom: 50px;">
+        <h2 style="margin-bottom: 30px; text-align: center;"><i data-lucide="layout-grid"></i> HASNOL 규격별 통합 AI 시공 분석 및 견적</h2>
+
+        <!-- Selection Tabs (Integrated Control) -->
+        <div class="analysis-tabs" style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; padding: 15px; background: #f0f4ff; border-radius: 20px; box-shadow: inset 0 2px 10px rgba(10,84,247,0.05); margin-bottom: 35px;">
+          <button class="analysis-tab active" data-id="rec" style="padding: 12px 20px; font-size: 0.85rem;">🛡️ 최적 추천 (Recommended)</button>
+          <button class="analysis-tab" data-id="600_std" style="padding: 12px 20px; font-size: 0.85rem;">600</button>
+          <button class="analysis-tab" data-id="600_lea" style="padding: 12px 20px; font-size: 0.85rem;">600 레더</button>
+          <button class="analysis-tab" data-id="800_std" style="padding: 12px 20px; font-size: 0.85rem;">800</button>
+          <button class="analysis-tab" data-id="800_lea" style="padding: 12px 20px; font-size: 0.85rem;">800 레더</button>
+          <button class="analysis-tab" data-id="1000_lea" style="padding: 12px 20px; font-size: 0.85rem;">1000 레더</button>
+          <button class="analysis-tab" data-id="1200_lea" style="padding: 12px 20px; font-size: 0.85rem;">1200 레더</button>
+        </div>
+
+        <!-- Side-by-Side Flex Layout -->
+        <div class="comparison-cols" style="display: flex; gap: 25px; flex-wrap: wrap; align-items: flex-start; justify-content: space-between;">
+
+          <!-- LEFT COLUMN: Comparison Table & Note -->
+          <div class="comparison-col-left" style="flex: 1.2; min-width: 400px; width: 0;">
+            <div id="comparisonSummaryTable" style="margin-bottom: 25px;">
+              <!-- Populated by JS -->
+            </div>
+            
+            <!-- AI Sketch & Simulation Section (Restored) -->
+            <div style="margin-bottom: 25px; border-radius: 20px; overflow: hidden; border: 1.5px solid var(--border-color); background: #ffffff; box-shadow: var(--shadow-soft);">
+              <div style="padding: 12px 20px; background: #fcfdfe; border-bottom: 1px solid #f2f2f7; font-weight: 800; font-size: 0.75rem; color: var(--primary); display: flex; justify-content: space-between; align-items: center;">
+                <span>STEP 1 : AI 시공 예상 스케치</span>
+                <span style="font-size: 0.6rem; color: #888; font-weight: 400;">* 선택한 규격에 맞춘 자동 배치도</span>
+              </div>
+              <div id="sketchPad" style="padding: 20px; background: #fff; min-height: 250px; display: flex; align-items: center; justify-content: center; overflow: auto; border-bottom: 1px dashed #eee;">
+                <!-- Canvas simulation rendered via app.js -->
+                <p style="color: #ccc; font-size: 0.8rem;">분석 데이터를 기반으로 스케치를 생성 중입니다...</p>
+              </div>
+              
+              <div style="padding: 12px 20px; background: #fcfdfe; border-bottom: 1px solid #f2f2f7; font-weight: 800; font-size: 0.75rem; color: var(--primary); display: flex; justify-content: space-between; align-items: center;">
+                <span>STEP 2 : AI 실사 시공 프리뷰 (NANO 2.0)</span>
+                <span style="font-size: 0.6rem; color: #888; font-weight: 400;">* 실제 주거 환경을 반영한 렌더링</span>
+              </div>
+              <div style="width: 100%; border-radius: 0;">
+                <img src="assets/hasnol_preview.png" alt="Nano Preview" style="width: 100%; display: block;">
+              </div>
+            </div>
+
+            <p style="font-size: 0.85rem; color: var(--text-muted); padding: 15px; background: #f8faff; border-radius: 12px; border: 1px solid #eef2ff;">
+              🎨 상시 업데이트되는 AI 분석 엔진이 공간 특성에 맞춰 최적의 배치를 제안합니다.
+            </p>
+          </div>
+
+          <!-- RIGHT COLUMN: Detailed Card -->
+          <div class="comparison-col-right" style="flex: 1; min-width: 380px; width: 0;">
+
+            <div id="activeReportGrid" style="margin-bottom: 25px;">
+              <!-- Active Detail Card injected here via JS -->
+            </div>
+
+            <!-- 맞춰형 시공 추천 후기 -->
+            <div style="border-radius: 20px; overflow: hidden; border: 1.5px solid var(--border-color); background: #fff; box-shadow: var(--shadow-soft);">
+              <div style="padding: 12px 20px; background: #fff9f0; border-bottom: 1px solid #ffe8d0; font-weight: 800; font-size: 0.75rem; color: #e67e22;">
+                ⭐ 맞춰형 시공 추천 후기 (SNS 리얼 데이터)
+              </div>
+              <div id="dynamicReviewsRight" style="padding: 15px; display: flex; flex-direction: column; gap: 10px;">
+                <a href="https://blog.naver.com/hasnol" target="_blank" style="display:flex; align-items:center; gap:12px; padding:12px; background:#f8f9fa; border-radius:12px; text-decoration:none; color:var(--text-main); border:1px solid #eee; transition:all 0.2s;" onmouseover="this.style.borderColor='#03C75A'" onmouseout="this.style.borderColor='#eee'">
+                  <span style="font-size:1.5rem;">📗</span>
+                  <div>
+                    <div style="font-weight:700; font-size:0.85rem; color:#03C75A;">네이버 블로그</div>
+                    <div style="font-size:0.75rem; color:#888;">HASNOL TPU 매트 시공 후기 보기</div>
+                  </div>
+                </a>
+                <a href="https://cafe.naver.com/hasnol" target="_blank" style="display:flex; align-items:center; gap:12px; padding:12px; background:#f8f9fa; border-radius:12px; text-decoration:none; color:var(--text-main); border:1px solid #eee; transition:all 0.2s;" onmouseover="this.style.borderColor='#03C75A'" onmouseout="this.style.borderColor='#eee'">
+                  <span style="font-size:1.5rem;">☕</span>
+                  <div>
+                    <div style="font-weight:700; font-size:0.85rem; color:#03C75A;">네이버 카페</div>
+                    <div style="font-size:0.75rem; color:#888;">지역별 시공 사례 문의</div>
+                  </div>
+                </a>
+                <a href="https://www.instagram.com/hasnol_official" target="_blank" style="display:flex; align-items:center; gap:12px; padding:12px; background:#f8f9fa; border-radius:12px; text-decoration:none; color:var(--text-main); border:1px solid #eee; transition:all 0.2s;" onmouseover="this.style.borderColor='#E1306C'" onmouseout="this.style.borderColor='#eee'">
+                  <span style="font-size:1.5rem;">📸</span>
+                  <div>
+                    <div style="font-weight:700; font-size:0.85rem; color:#E1306C;">인스타그램</div>
+                    <div style="font-size:0.75rem; color:#888;">실시간 시공 현장 사진</div>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+      <!-- AI Certification Vault -->
+      <section class="card animate-in"
+        style="background: linear-gradient(135deg, #fff8f8 0%, #ffffff 100%); border: 1.5px solid #ffd5d5;">
+        <h2 style="margin-bottom: 8px; text-align: center;"><i data-lucide="shield-check"
+            style="color:#c0392b;"></i> HASNOL 공식 국가인증 및 안전성 리포트</h2>
+        <p style="text-align:center; font-size:0.8rem; color:#888; margin-bottom:25px;">하스놀의 검증된 기술력을 투명하게 공개합니다 | 출처: KOTITI · FITI · SGS · KCL · KTR · KSPO</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+          <div style="background:#fff; border:1px solid #ffe0e0; border-radius:14px; padding:18px 15px; text-align:center;">
+            <div style="font-size:1.8rem; margin-bottom:8px;">🌬️</div>
+            <div style="font-weight:800; font-size:0.85rem; color:#c0392b; margin-bottom:5px;">라돈 안심인증</div>
+            <div style="font-size:0.72rem; color:#999;">KOTITI 실내공기질 테스트</div>
+          </div>
+          <div style="background:#fff; border:1px solid #ffe0e0; border-radius:14px; padding:18px 15px; text-align:center;">
+            <div style="font-size:1.8rem; margin-bottom:8px;">🔥</div>
+            <div style="font-weight:800; font-size:0.85rem; color:#c0392b; margin-bottom:5px;">난연 인증</div>
+            <div style="font-size:0.72rem; color:#999;">KTR 난연 (UL 94 V-2)</div>
+          </div>
+          <div style="background:#fff; border:1px solid #ffe0e0; border-radius:14px; padding:18px 15px; text-align:center;">
+            <div style="font-size:1.8rem; margin-bottom:8px;">💪</div>
+            <div style="font-weight:800; font-size:0.85rem; color:#c0392b; margin-bottom:5px;">충격흡수율 73.6%</div>
+            <div style="font-size:0.72rem; color:#999;">KSPO 국민체육진흥공단</div>
+          </div>
+          <div style="background:#fff; border:1px solid #ffe0e0; border-radius:14px; padding:18px 15px; text-align:center;">
+            <div style="font-size:1.8rem; margin-bottom:8px;">🌍</div>
+            <div style="font-weight:800; font-size:0.85rem; color:#c0392b; margin-bottom:5px;">SGS 글로벌 인증</div>
+            <div style="font-size:0.72rem; color:#999;">충격흡수율 98% 달성</div>
+          </div>
+          <div style="background:#fff; border:1px solid #ffe0e0; border-radius:14px; padding:18px 15px; text-align:center;">
+            <div style="font-size:1.8rem; margin-bottom:8px;">🔬</div>
+            <div style="font-weight:800; font-size:0.85rem; color:#c0392b; margin-bottom:5px;">KCL TPU 전문인증</div>
+            <div style="font-size:0.72rem; color:#999;">소음·충격 정밀 테스트</div>
+          </div>
+          <div style="background:#fff; border:1px solid #ffe0e0; border-radius:14px; padding:18px 15px; text-align:center;">
+            <div style="font-size:1.8rem; margin-bottom:8px;">📋</div>
+            <div style="font-weight:800; font-size:0.85rem; color:#c0392b; margin-bottom:5px;">FITI 검사성적서</div>
+            <div style="font-size:0.72rem; color:#999;">국가공인 시험 통과</div>
+          </div>
+          <div style="background:#fff; border:1px solid #ffe0e0; border-radius:14px; padding:18px 15px; text-align:center;">
+            <div style="font-size:1.8rem; margin-bottom:8px;">🏆</div>
+            <div style="font-weight:800; font-size:0.85rem; color:#c0392b; margin-bottom:5px;">ISO 9001:2015</div>
+            <div style="font-size:0.72rem; color:#999;">품질경영 국제표준</div>
+          </div>
+          <div style="background:#fff; border:1px solid #ffe0e0; border-radius:14px; padding:18px 15px; text-align:center;">
+            <div style="font-size:1.8rem; margin-bottom:8px;">🐾</div>
+            <div style="font-weight:800; font-size:0.85rem; color:#c0392b; margin-bottom:5px;">반려동물 친환경</div>
+            <div style="font-size:0.72rem; color:#999;">KACI 안전 적합성 인증</div>
+          </div>
+          <div style="background:#fff; border:1px solid #ffe0e0; border-radius:14px; padding:18px 15px; text-align:center;">
+            <div style="font-size:1.8rem; margin-bottom:8px;">🌸</div>
+            <div style="font-weight:800; font-size:0.85rem; color:#c0392b; margin-bottom:5px;">아토피 안심인증</div>
+            <div style="font-size:0.72rem; color:#999;">아토피협회 추천 제품</div>
+          </div>
+          <div style="background:#fff; border:1px solid #ffe0e0; border-radius:14px; padding:18px 15px; text-align:center;">
+            <div style="font-size:1.8rem; margin-bottom:8px;">👶</div>
+            <div style="font-weight:800; font-size:0.85rem; color:#c0392b; margin-bottom:5px;">KC 어린이 안전인증</div>
+            <div style="font-size:0.72rem; color:#999;">FITI 안전확인신고증</div>
+          </div>
+          <div style="background:#fff; border:1px solid #ffe0e0; border-radius:14px; padding:18px 15px; text-align:center;">
+            <div style="font-size:1.8rem; margin-bottom:8px;">™️</div>
+            <div style="font-weight:800; font-size:0.85rem; color:#c0392b; margin-bottom:5px;">상표권 등록</div>
+            <div style="font-size:0.72rem; color:#999;">특허청 지식재산권</div>
+          </div>
+          <div style="background:#fff; border:1px solid #ffe0e0; border-radius:14px; padding:18px 15px; text-align:center;">
+            <div style="font-size:1.8rem; margin-bottom:8px;">🌐</div>
+            <div style="font-weight:800; font-size:0.85rem; color:#c0392b; margin-bottom:5px;">Global FITI</div>
+            <div style="font-size:0.72rem; color:#999;">KOLAS 공인 검사 통과</div>
+          </div>
+        </div>
+        <p style="margin-top: 20px; font-size: 0.75rem; color: #888; text-align: center;">* 모든 데이터는 www.hasnol.kr 및 국가공인기관(KOTITI, FITI, SGS) 공식 리포트 기반입니다.</p>
+      </section>
+
+      <!-- TPU Characteristics Section (Moved to Bottom) -->
+      <section class="card animate-in" id="tpuFeaturesSection" style="margin-top: 20px;">
+        <h2 style="margin-bottom: 25px;"><i data-lucide="check-circle"></i> HASNOL TPU 매트의 주요 특장점</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
+          <div style="padding: 15px; background: #f8faff; border-radius: 12px; border: 1px solid #eef2ff;">
+            <h4 style="color: var(--primary); margin-bottom: 8px;">🛡️ 우수한 내구성 및 복원력</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">고밀도 TPU 소재를 사용하여 무거운 가구 눌림에도 뛰어난 복원력을 보장합니다. 친환경 무가교 공법으로 제작된 프리미엄 자재입니다.</p>
+          </div>
+          <div style="padding: 15px; background: #fffcf8; border-radius: 12px; border: 1px solid #fff3e0;">
+            <h4 style="color: #e67e22; margin-bottom: 8px;">👶 무독성 친환경 소재</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">의료기기나 유아용 식기에 사용되는 안전한 TPU 소재로, 8대 중금속 및 유해물질 불검출 인증을 완료했습니다.</p>
+          </div>
+          <div style="padding: 15px; background: #f8fff9; border-radius: 12px; border: 1px solid #e8f5e9;">
+            <h4 style="color: #2ecc71; margin-bottom: 8px;">🤫 층간소음 차단 및 충격흡수</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">에어셀 구조가 진동과 충격을 효과적으로 흡수하며, 충격흡수율 98% 국내 최다 수준을 기록합니다.</p>
+          </div>
+          <div style="padding: 15px; background: #fcf8ff; border-radius: 12px; border: 1px solid #f3e5f5;">
+            <h4 style="color: #9b59b6; margin-bottom: 8px;">🧼 간편한 청결 유지</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">표면 특수 코팅으로 수분 흡수가 되지 않아 음식물을 흘려도 가볍게 닦아내는 것만으로 깨끗하게 관리할 수 있습니다.</p>
+          </div>
+          <div style="padding: 15px; background: #f8fcff; border-radius: 12px; border: 1px solid #ddeeff;">
+            <h4 style="color: #2980b9; margin-bottom: 8px;">❄️ 온도 적응형 소재</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">여름엔 시원하고 겨울엔 따뜻한 열 전도 특성으로, 계절에 관계없이 쾌적한 바닥 환경을 유지합니다.</p>
+          </div>
+          <div style="padding: 15px; background: #fffef0; border-radius: 12px; border: 1px solid #fffacd;">
+            <h4 style="color: #f39c12; margin-bottom: 8px;">🔇 저소음 슬라이딩</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">매트 아래 마찰음이나 끌림 소리 없이 부드럽게 이동됩니다. 무가교 접착방식으로 이음새 소리도 발생하지 않습니다.</p>
+          </div>
+        </div>
+    </div>
+
+
+    <!-- Document Section (Contract / Guarantee) -->
+    <section class="card document-section no-print content-width-sync" 
+             style="margin-top: 60px; text-align: center; border: 3px double var(--primary-light); padding: 80px 50px; border-radius: 40px; background: #fff; box-shadow: var(--shadow-premium);">
+      
+      <!-- Official Header Section -->
+      <div style="margin-bottom: 60px; border-bottom: 3px solid #333; padding-bottom: 30px; display: inline-block; width: 100%; max-width: 800px;">
+        <h3 style="font-size: 1.1rem; color: var(--primary); letter-spacing: 0.25em; font-weight: 800; margin-bottom: 12px; text-transform: uppercase;">HASNOL ESTIMATE & CONTRACT</h3>
+        <h1 style="font-size: 1.85rem; color: var(--text-main); font-weight: 900; letter-spacing: -0.06em; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">HASNOL 프리미엄 바닥매트 시공 견적서 및 표준 계약서</h1>
+        <p style="margin-top: 10px; font-size: 0.8rem; color: #888; font-weight: 500;">본 문서는 정품 HASNOL TPU 매트 시공에 따른 품질 보증 및 표준 계약 내용을 포함합니다.</p>
+      </div>
+
+      <!-- ========== 견적 요약 [JS에 의해 자동 주입] ========== -->
+      <div id="contractEstimateSummary" style="max-width:900px; margin:0 auto 50px; text-align:left; display:none;">
+        <!-- JS가 calculateEstimate() 완료 후 이 영역을 채웁니다 -->
+      </div>
+
+      <div class="info-section" style="max-width: 900px; margin: 0 auto;">
+        
+        <!-- SECTION 1: Precautions -->
+        <div style="margin-bottom: 60px;">
+          <h2 style="font-size: 1.6rem; margin-bottom: 35px; text-align: center; color: var(--text-main); font-weight: 800;">
+            <i data-lucide="info" style="width: 24px; height: 24px; margin-right: 8px;"></i> 시공 및 유지관리 주요 수칙
+          </h2>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; text-align: left;">
+            <div style="padding: 15px; border-left: 3px solid #eee; font-size: 0.95rem;"><strong style="color: var(--primary);">01. 고온 주의:</strong> 스팀 청소기 사용 금지, 직사광선 노출 최소화.</div>
+            <div style="padding: 15px; border-left: 3px solid #eee; font-size: 0.95rem;"><strong style="color: var(--primary);">02. 습기 관리:</strong> 액체 주입 시 즉시 건조, 환기 필수.</div>
+            <div style="padding: 15px; border-left: 3px solid #eee; font-size: 0.95rem;"><strong style="color: var(--primary);">03. 중량물 주의:</strong> 무거운 가구 장기 방치 시 복원 방해 가능성.</div>
+            <div style="padding: 15px; border-left: 3px solid #eee; font-size: 0.95rem;"><strong style="color: var(--primary);">04. 오염 방지:</strong> 유성매직, 색소 강한 음식물 영구 이염 주의.</div>
+            <div style="padding: 15px; border-left: 3px solid #eee; font-size: 0.95rem;"><strong style="color: var(--primary);">05. 스크래치 유의:</strong> 날카로운 물체 및 반려동물의 발톱 주의.</div>
+            <div style="padding: 15px; border-left: 3px solid #eee; font-size: 0.95rem;"><strong style="color: var(--primary);">06. 자연 현상:</strong> 필름 기포/주름은 공법상 무상 AS 대상 제외.</div>
+          </div>
+        </div>
+
+        <!-- SECTION 2: Legal Terms -->
+        <div style="background: #fdfdfd; border: 1px solid #e5e5e7; padding: 45px; border-radius: 20px; text-align: left;">
+          <h3 style="font-size: 1.3rem; color: var(--primary); font-weight: 800; margin-bottom: 30px; text-align: center;">📑 시공 서비스 표준 계약 및 A/S 규정</h3>
+
+          <div style="margin-bottom: 25px; display: flex; flex-direction: column; gap: 20px;">
+            <div style="padding: 15px; background: #fff; border: 1px solid #eee; border-radius: 8px;">
+              <p style="margin: 0;"><strong>제 1조 (시공 및 정산)</strong> 본 시공은 정품 TPU 매트를 사용하며, 최종 대금은 시공 완료 후 실제 현장에서 사용된 확정 수량(실제 수량 카운터)을 기준으로 정산함을 원칙으로 합니다. 집안 실제 구조, 문 두께, 가구 배치 등 환경 변수에 따라 산출된 예상 수량과 차이가 발생할 수 있습니다.</p>
+            </div>
+
+            <div style="padding: 15px; background: #fff; border: 1px solid #eee; border-radius: 8px;">
+              <p style="margin: 0 0 10px 0;"><strong>제 2조 (품질 보장 및 오차)</strong></p>
+              <ul style="padding-left: 20px; margin: 0; font-size: 0.85rem; line-height: 1.7;">
+                <li style="margin-bottom: 5px;"><strong>품질 기준:</strong> 발색, 폼 밀도 등 품질 편차는 ±3cm 이내를 정상 범위로 간주하며, 수작업 특성상 미세한 틈이나 오차가 발생할 수 있습니다.</li>
+                <li style="margin-bottom: 5px;"><strong>A/S 기간:</strong> 시공 불량(7일), 제품 결함(90일) 보장을 원칙으로 합니다.</li>
+                <li style="margin-bottom: 5px;"><strong>자연 현상:</strong> 사계절 수축/팽창 및 일조량에 따른 황변은 자연스러운 물리 반응입니다.</li>
+                <li><strong>특이 사항:</strong> TPU매트는 무가교 친환경 방식 제품으로 사용 후 필름 기포/주름이 생길 수 있으며 이는 무상 AS 및 바닥 하자 보상 대상이 아닙니다.</li>
+              </ul>
+            </div>
+
+            <div style="padding: 15px; background: #fff; border: 1px solid #eee; border-radius: 8px;">
+              <p style="margin: 0;"><strong>제 3조 (이용 수칙 및 주의사항)</strong> 고온 스팀 청소기 사용 금지, 습기 발생 시 즉시 건조가 필요합니다. 시공 완료 후에는 매트 재단 및 현장 특성상 단순 변심에 의한 교환/환불이 절대 불가합니다.</p>
+            </div>
+
+            <div style="padding: 15px; background: #fff; border: 1px solid #eee; border-radius: 8px;">
+              <p style="margin: 0;"><strong>제 4조 (해약 조건 및 후기 규정)</strong> <span style="background:#fff3e0; color:#e67e22; font-size:0.8rem; padding:2px 8px; border-radius:6px; margin-right:5px;">⚠️ 후기 할인 고객 필독</span><br>
+              후기할인조건으로 진행하신 고객분은 일주일 이내 후기 미작성 시 혜택이 회수됩니다. 또한 재단 시작 후 해약 시에는 발생 비용 전액이 고객에게 청구됩니다.</p>
+            </div>
+          </div>
+
+          <!-- Signature Row: 갑 & 을 side by side -->
+          <div style="margin-top: 50px; padding-top: 30px; border-top: 1.5px solid #333; display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+            
+            <!-- 갑 (의뢰인) -->
+            <div style="text-align: center;">
+              <p style="font-weight: 800; font-size: 1.05rem; margin-bottom: 10px; color: var(--text-main);">갑 (의뢰인)</p>
+              <input type="text" id="contractBuyerName" placeholder="이름 입력"
+                style="border: none; border-bottom: 1.5px solid #333; padding: 6px 10px; font-size: 0.95rem; font-weight: 700; text-align: center; width: 100%; max-width: 200px; background: transparent; margin-bottom: 12px; display: block; margin-left: auto; margin-right: auto;">
+              <div style="position: relative; width: 100%; max-width: 260px; height: 90px; border: 1.5px dashed #ccc; border-radius: 10px; background: #fafafa; overflow: hidden; margin: 0 auto;">
+                <canvas id="signaturePad" width="260" height="90" style="position: absolute; top:0; left:0; width:100%; height:100%; cursor: crosshair; touch-action: none;"></canvas>
+                <div id="signPlaceholder" style="position: absolute; top:50%; left:50%; transform:translate(-50%,-50%); color: #bbb; font-size: 0.75rem; pointer-events: none; white-space: nowrap;">서명란 (터치/마우스)</div>
+                <button id="clearSignBtn" class="no-print" style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.4); color: white; border: none; font-size: 0.6rem; padding: 2px 7px; border-radius: 4px; cursor: pointer; z-index: 10;">지우기</button>
+              </div>
+            </div>
+
+            <!-- 을 (시공사) -->
+            <div style="text-align: center; position: relative;">
+              <p style="font-weight: 800; font-size: 1.05rem; margin-bottom: 10px; color: var(--text-main);">을 (시공사): HASNOL 주식회사</p>
+              <input type="text" id="managerName" value="HASNOL 담당자"
+                style="border: none; border-bottom: 1.5px solid #333; padding: 6px 10px; font-size: 0.95rem; font-weight: 700; text-align: center; width: 100%; max-width: 200px; background: transparent; margin-bottom: 12px; display: block; margin-left: auto; margin-right: auto;">
+              <div style="position: relative; width: 100%; max-width: 260px; height: 90px; border: 1.5px dashed #ccc; border-radius: 10px; background: #fafafa; overflow: hidden; margin: 0 auto;">
+                <canvas id="signaturePadCompany" width="260" height="90" style="position: absolute; top:0; left:0; width:100%; height:100%; cursor: crosshair; touch-action: none;"></canvas>
+                <div id="signPlaceholderCompany" style="position: absolute; top:50%; left:50%; transform:translate(-50%,-50%); color: #bbb; font-size: 0.75rem; pointer-events: none; white-space: nowrap;">서명란 (터치/마우스)</div>
+                <button id="clearSignBtnCompany" class="no-print" style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.4); color: white; border: none; font-size: 0.6rem; padding: 2px 7px; border-radius: 4px; cursor: pointer; z-index: 10;">지우기</button>
+                <img src="assets/seal.png" alt="Official Seal"
+                  style="position: absolute; bottom: 5px; right: 10px; width: 55px; height: 55px; opacity: 0.9; mix-blend-mode: multiply; pointer-events: none;">
+              </div>
+              <p style="margin-top: 8px; font-size: 0.75rem; color: #999;">1660-1195 | 김포시 누산리 399-6</p>
+            </div>
+          </div>
+
+          <div style="margin-top: 25px; text-align: center; color: #888; font-size: 0.75rem;">
+            * 본 문서는 HASNOL 공식 견적 시스템을 통해 발행된 표준 계약서입니다.
+          </div>
+        </div>
+    </section>
+
+    <!-- Fixed Bottom Action Bar -->
+    <div class="bottom-action-bar no-print">
+      <button class="btn btn-secondary" id="downloadPdfBtn">
+        <i data-lucide="printer"></i> 문서 출력 (Print)
+      </button>
+      <button class="btn btn-primary" id="sharePdfBtn">
+        <i data-lucide="share-2"></i> 스마트 기기 PDF 공유/전송
+      </button>
+    </div>
+
+    <footer style="text-align: center; margin-top: 40px; color: var(--text-muted); font-size: 0.85rem;">
+      <p>&copy; 2026 HASNOL Premium Floor Mat. All Rights Reserved.</p>
+      <p style="margin-top: 8px; font-size: 0.75rem; color: #aaa; border-top: 1px solid #eee; padding-top: 12px;">
+        이 프로그램의 저작권은 <strong>하맘콘텐츠</strong>에 있으며, 무단 복제 및 배포 시 민사상 및 형사상 법적 책임을 집니다.
+      </p>
+    </footer>
+  </div>
+
+  <!-- PDF Share Options Modal -->
+  <div id="shareOptionsModal" class="no-print" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:9999; align-items:flex-end; justify-content:center;">
+    <div style="background:white; width:100%; max-width:500px; border-radius:24px 24px 0 0; padding:28px 24px 44px; box-shadow:0 -8px 40px rgba(0,0,0,0.2);">
+      <div style="text-align:center; margin-bottom:24px;">
+        <div style="width:44px; height:5px; background:#e0e0e0; border-radius:3px; margin:0 auto 18px;"></div>
+        <h3 style="margin:0; font-size:1.15rem; font-weight:800; color:var(--text-main);">📤 PDF 공유 방법 선택</h3>
+        <p style="margin:6px 0 0; font-size:0.8rem; color:#999;">원하시는 방법으로 견적서를 전송하세요</p>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:16px;">
+        <button id="shareNativeBtn" class="share-opt-btn" style="background:#eef2ff;">
+          <span style="font-size:2rem;">📱</span>
+          <span style="font-weight:700;">시스템 공유</span>
+        </button>
+        <button id="shareKakaoBtn" class="share-opt-btn" style="background:#fffde7;">
+          <span style="font-size:2rem;">💛</span>
+          <span style="font-weight:700;">카카오톡</span>
+          <small>친구에게 전송</small>
+        </button>
+        <button id="shareEmailBtn" class="share-opt-btn" style="background:#e3f2fd;">
+          <span style="font-size:2rem;">📧</span>
+          <span style="font-weight:700;">이메일</span>
+          <small>메일로 보내기</small>
+        </button>
+        <button id="shareSMSBtn" class="share-opt-btn" style="background:#f0fff4;">
+          <span style="font-size:2rem;">💬</span>
+          <span style="font-weight:700;">문자 보내기</span>
+          <small>SMS 전송</small>
+        </button>
+        <button id="shareFaxBtn" class="share-opt-btn" style="background:#f5f5f5;">
+          <span style="font-size:2rem;">📠</span>
+          <span style="font-weight:700;">모바일 팩스</span>
+          <small>실물을 팩스로 전송</small>
+        </button>
+        <button id="shareDriveBtn" class="share-opt-btn" style="background:#e8f5e9;">
+          <span style="font-size:2rem;">☁️</span>
+          <span style="font-weight:700;">구글 드라이브</span>
+          <small>드라이브에 보관</small>
+        </button>
+      </div>
+      <!-- 고객 이메일 전송 전용 버튼 -->
+      <button id="shareCustomerEmailBtn" style="width:100%; padding:16px; background:linear-gradient(135deg, #1a73e8, #0d47a1); border:none; border-radius:14px; cursor:pointer; font-size:0.95rem; font-weight:700; color:white; margin-bottom:10px; display:flex; align-items:center; justify-content:center; gap:10px;">
+        <span style="font-size:1.3rem;">✉️</span> 고객에게 견적서 이메일 작성
+      </button>
+      <button id="closeShareModal" style="width:100%; padding:14px; background:#f5f5f7; border:none; border-radius:14px; cursor:pointer; font-size:0.95rem; font-weight:600; color:#666;">닫기</button>
+    </div>
+    <p style="text-align: center; color: #aaa; margin-top: 40px; font-size: 0.8rem; border-top: 1px solid #ddd; padding-top: 20px;">
+      모든 소유권은 하맘컨텐츠에 있습니다.
+    </p>
+  </div>
+
+  <!-- ✉️ 고객 이메일 작성 모달 -->
+  <div id="emailComposeModal" class="no-print" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:10000; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:white; width:100%; max-width:560px; border-radius:24px; padding:32px; box-shadow:0 20px 60px rgba(0,0,0,0.3); max-height:90vh; overflow-y:auto;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <div>
+          <h3 style="margin:0; font-size:1.2rem; font-weight:800; color:#1a1a1e;">✉️ 고객 이메일 작성</h3>
+          <p style="margin:4px 0 0; font-size:0.8rem; color:#999;">견적서 PDF와 함께 이메일을 전송합니다</p>
+        </div>
+        <button id="closeEmailModal" style="border:none; background:#f5f5f7; border-radius:50%; width:36px; height:36px; font-size:1.1rem; cursor:pointer; color:#666;">✕</button>
+      </div>
+
+      <!-- 받는 사람 -->
+      <div style="margin-bottom:16px;">
+        <label style="font-weight:700; font-size:0.85rem; color:#333; display:block; margin-bottom:6px;">📨 받는 사람 (고객 이메일)</label>
+        <input type="email" id="emailTo" placeholder="customer@email.com" style="width:100%; padding:12px 16px; border:1.5px solid #e0e0e0; border-radius:12px; font-size:0.95rem; box-sizing:border-box; transition:border 0.2s;" onfocus="this.style.borderColor='#1a73e8'" onblur="this.style.borderColor='#e0e0e0'">
+      </div>
+
+      <!-- 제목 -->
+      <div style="margin-bottom:16px;">
+        <label style="font-weight:700; font-size:0.85rem; color:#333; display:block; margin-bottom:6px;">📌 이메일 제목</label>
+        <input type="text" id="emailSubject" style="width:100%; padding:12px 16px; border:1.5px solid #e0e0e0; border-radius:12px; font-size:0.95rem; box-sizing:border-box; transition:border 0.2s;" onfocus="this.style.borderColor='#1a73e8'" onblur="this.style.borderColor='#e0e0e0'">
+      </div>
+
+      <!-- 본문 -->
+      <div style="margin-bottom:20px;">
+        <label style="font-weight:700; font-size:0.85rem; color:#333; display:block; margin-bottom:6px;">📝 이메일 본문</label>
+        <textarea id="emailBody" rows="10" style="width:100%; padding:14px 16px; border:1.5px solid #e0e0e0; border-radius:12px; font-size:0.88rem; line-height:1.7; box-sizing:border-box; resize:vertical; font-family:inherit; transition:border 0.2s;" onfocus="this.style.borderColor='#1a73e8'" onblur="this.style.borderColor='#e0e0e0'"></textarea>
+      </div>
+
+      <!-- PDF 첨부 안내 -->
+      <div style="background:#e8f5e9; border:1px solid #c8e6c9; border-radius:12px; padding:12px 16px; margin-bottom:20px; font-size:0.82rem; color:#2e7d32; display:flex; align-items:center; gap:10px;">
+        <span style="font-size:1.4rem;">📎</span>
+        <div>
+          <strong>PDF 자동 다운로드 후 첨부</strong><br>
+          이메일 앱이 열리면 다운로드된 PDF 파일을 첨부해 주세요.
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <button id="copyEmailBodyBtn" style="padding:14px; background:#f5f5f7; border:none; border-radius:12px; cursor:pointer; font-size:0.9rem; font-weight:600; color:#333;">📋 본문 복사</button>
+        <button id="sendEmailBtn" style="padding:14px; background:linear-gradient(135deg, #1a73e8, #0d47a1); border:none; border-radius:12px; cursor:pointer; font-size:0.9rem; font-weight:700; color:white;">✉️ 이메일 앱 열기</button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    :root { --shadow-premium: 0 12px 48px rgba(0, 0, 0, 0.08); }
+    .share-opt-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      padding: 20px 10px; border: none; border-radius: 18px;
+      cursor: pointer; font-size: 0.85rem; color: var(--text-main);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .share-opt-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+    .share-opt-btn small { font-size: 0.72rem; color: #999; font-weight: 400; }
+
+    @media (max-width: 768px) {
+      :root { --border-radius: 16px; }
+      .container { padding: 40px 15px; }
+      h1 { font-size: 2.2rem; }
+      .card { padding: 25px 20px; }
+      .grid-layout { grid-template-columns: 1fr !important; }
+      input, select, button { font-size: 16px !important; }
+    }
+  </style>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
