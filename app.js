@@ -1,5 +1,15 @@
 // Hasnol Estimate App Logic
 
+function safeCreateIcons() {
+    try {
+        if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+            safeCreateIcons();
+        }
+    } catch (e) {
+        console.warn('lucide.createIcons 실패:', e);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
     const customerNameIpt = document.getElementById('customerName');
@@ -144,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    lucide.createIcons();
+    safeCreateIcons();
 
     // Initial State
     updateContract();
@@ -193,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateBasePrice();
         calculateEstimate();
         updateContract();
-        lucide.createIcons();
+        safeCreateIcons();
     };
 
     // Attach click events to specification tabs
@@ -1147,7 +1157,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p style="font-size: 0.65rem; color: #888;">${cert.body}</p>
             </a>
         `).join('');
-        lucide.createIcons();
+        safeCreateIcons();
     }
 
     function updateDynamicReviews(selectedSize, selectedType) {
@@ -1171,8 +1181,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Initial renders
-    renderCertifications();
-    calculateEstimate(); // Calls updateDynamicReviews inside
+    try { renderCertifications(); } catch(e) { console.warn('renderCertifications 오류:', e); }
+    try { calculateEstimate(); } catch(e) { console.warn('calculateEstimate 초기화 오류:', e); } // Calls updateDynamicReviews inside
     
     // Final Trigger Integration
     const originalCalc = calculateEstimate;
