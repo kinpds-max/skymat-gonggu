@@ -671,12 +671,18 @@
     </section>
 
     <!-- Fixed Bottom Action Bar -->
-    <div class="bottom-action-bar no-print">
-      <button class="btn btn-secondary" id="downloadPdfBtn">
-        <i data-lucide="printer"></i> 문서 출력 (Print)
+    <div class="bottom-action-bar no-print" style="display:flex; justify-content:center; gap:12px; padding:20px; background:rgba(255,255,255,0.95); backdrop-filter:blur(10px); border-top:1px solid #eee; position:fixed; bottom:0; left:0; right:0; z-index:1000;">
+      <button class="btn btn-secondary" id="downloadPdfBtn" style="padding:16px 24px; font-weight:700; border-radius:14px; background:#475569; color:white; border:none; display:flex; align-items:center; gap:8px;">
+        <i data-lucide="printer"></i> PDF 출력/인쇄
       </button>
-      <button class="btn btn-primary" id="sharePdfBtn">
-        <i data-lucide="share-2"></i> 스마트 기기 PDF 공유/전송
+      <button class="btn btn-primary" id="downloadHtmlBtnDetailed" style="padding:16px 24px; font-weight:700; border-radius:14px; background:#6366f1; color:white; border:none; display:flex; align-items:center; gap:8px;">
+        💾 HTML 저장
+      </button>
+      <button class="btn btn-primary" id="shareCustomerEmailBtnDetailed" style="padding:16px 24px; font-weight:700; border-radius:14px; background:#10B981; color:white; border:none; display:flex; align-items:center; gap:8px;">
+        ✉️ 이메일 발송
+      </button>
+      <button class="btn btn-primary" id="sharePdfBtn" style="padding:16px 24px; font-weight:700; border-radius:14px; background:var(--primary); color:white; border:none; display:flex; align-items:center; gap:8px;">
+        <i data-lucide="share-2"></i> PDF 공유
       </button>
     </div>
 

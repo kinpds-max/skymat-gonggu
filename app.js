@@ -1721,4 +1721,36 @@ HASNOL 하스놀 드림`;
             downloadBlobFile(result.blob, result.fileName);
         });
     }
+
+    // --- HTML 저장 기능 (상세 견적 전용) ---
+    const downloadHtmlBtnDetailed = document.getElementById('downloadHtmlBtnDetailed');
+    if (downloadHtmlBtnDetailed) {
+        downloadHtmlBtnDetailed.addEventListener('click', () => {
+            const htmlContent = document.documentElement.outerHTML;
+            const blob = new Blob(['<!DOCTYPE html>\n' + htmlContent], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const name = customerNameIpt?.value || '고객';
+            const filename = `HASNOL_견적서_${name}.html`;
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('💾 HTML 파일이 저장되었습니다.');
+        });
+    }
+
+    // --- 이메일 발송 기능 (상세 견적 전용 - 저장 후 연동) ---
+    const shareCustomerEmailBtnDetailed = document.getElementById('shareCustomerEmailBtnDetailed');
+    if (shareCustomerEmailBtnDetailed) {
+        shareCustomerEmailBtnDetailed.addEventListener('click', () => {
+            // HTML 저장 먼저 실행
+            if (downloadHtmlBtnDetailed) downloadHtmlBtnDetailed.click();
+            
+            // 그 다음 이메일 모달 열기
+            setTimeout(openEmailComposeModal, 600);
+        });
+    }
 });
