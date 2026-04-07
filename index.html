@@ -16,6 +16,9 @@
   <!-- PDF Generation Dependencies -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  
+  <!-- Supabase Client SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
@@ -685,6 +688,9 @@
       </div>
 
       <div class="ba-btns">
+        <button class="btn-ba-secondary" id="saveCloudBtn" title="클라우드 저장" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.3);">
+          ☁️
+        </button>
         <button class="btn-ba-secondary" id="downloadPdfBtn" title="PDF 저장/인쇄">
           🖨️
         </button>

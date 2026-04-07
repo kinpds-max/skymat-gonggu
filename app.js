@@ -1791,4 +1791,67 @@ HASNOL 하스놀 드림`;
             openEmailComposeModal();
         });
     }
+
+    // --- Supabase Cloud Storage Integration ---
+    const SUPABASE_URL = 'https://vbrnzmakcthhaxktclnt.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_Ew2ZB1EqFa4eAITuxhoO5w_944IyA2F';
+    
+    // Initialize Supabase only if values are provided
+    let supabaseClient = null;
+    if (SUPABASE_URL !== 'YOUR_SUPABASE_PROJECT_URL' && window.supabase) {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    }
+
+    async function saveEstimateToCloud() {
+        if (!supabaseClient || SUPABASE_URL === 'YOUR_SUPABASE_PROJECT_URL') {
+            alert('⚠️ Supabase 설정이 필요합니다.\napp.js 하단 코드에서 URL과 Anon Key를 입력해 주세요.\n(현재는 입력 대기 중입니다)');
+            return;
+        }
+
+        const cloudBtn = document.getElementById('saveCloudBtn');
+        const originalContent = cloudBtn.innerHTML;
+        cloudBtn.innerHTML = '⏳';
+        cloudBtn.disabled = true;
+
+        try {
+            const customerName = document.getElementById('customerName')?.value || '익명 고객';
+            const customerPhone = document.getElementById('customerPhone')?.value || '';
+            const customerApt = document.getElementById('customerApt')?.value || '';
+            const customerSize = document.getElementById('customerSize')?.value || '';
+            const customerScope = document.getElementById('customerScope')?.value || '';
+            
+            const qtyStr = document.getElementById('ba_qty')?.textContent || '0';
+            const totalStr = document.getElementById('ba_total')?.textContent || '0';
+            const totalQty = parseInt(qtyStr.replace(/[^0-9]/g, '')) || 0;
+            const totalAmt = parseInt(totalStr.replace(/[^0-9]/g, '')) || 0;
+
+            const { data, error } = await supabaseClient
+                .from('estimates')
+                .insert([
+                    {
+                        customer_name: customerName,
+                        customer_phone: customerPhone,
+                        apt_name: customerApt,
+                        pyeong: customerSize,
+                        scope: customerScope,
+                        total_qty: totalQty,
+                        total_amount: totalAmt,
+                        created_at: new Date().toISOString()
+                    }
+                ]);
+
+            if (error) throw error;
+            showToast('✅ 클라우드로 견적이 안전하게 전송되었습니다!');
+        } catch (err) {
+            console.error('Supabase Save Error:', err);
+            alert('❌ 저장 실패: ' + err.message + '\n(대시보드에서 estimates 테이블과 컬럼이 생성되어 있는지 확인하세요)');
+        } finally {
+            if(cloudBtn) {
+                cloudBtn.innerHTML = originalContent;
+                cloudBtn.disabled = false;
+            }
+        }
+    }
+
+    document.getElementById('saveCloudBtn')?.addEventListener('click', saveEstimateToCloud);
 });

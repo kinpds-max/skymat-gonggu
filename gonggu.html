@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --sky: #0EA5E9;
@@ -622,6 +623,7 @@
     </div>
   </div>
   <div class="header-right">
+    <button class="btn-print" id="cloudSyncBtn" onclick="syncWithCloud()" style="background:var(--green); border:none;">🔄 클라우드 동기화</button>
     <button class="btn-print" onclick="window.print()">🖨️ 인쇄</button>
     <button class="btn-print" onclick="location.href='index.html'">📋 견적기로</button>
   </div>
@@ -983,6 +985,14 @@
     { min: 10, discount: 2000, label: '10세대+ (-2,000원)' }
   ];
 
+  // === SUPABASE CONFIG ===
+  const SUPABASE_URL = 'https://vbrnzmakcthhaxktclnt.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_Ew2ZB1EqFa4eAITuxhoO5w_944IyA2F';
+  let supabase = null;
+  if (SUPABASE_URL !== 'YOUR_SUPABASE_PROJECT_URL') {
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  }
+
   let entries = JSON.parse(localStorage.getItem('gg_entries') || '[]');
   let activeChips = new Set();
 
@@ -1037,7 +1047,7 @@
     document.getElementById('f_qty').value = qty;
   }
 
-  function addEntry() {
+  async function addEntry() {
     const name = document.getElementById('f_name').value.trim();
     const phone = document.getElementById('f_phone').value.trim();
     const unit = document.getElementById('f_unit').value.trim();
@@ -1063,6 +1073,27 @@
       chips: Array.from(activeChips)
     };
 
+    // --- Save to Supabase Cloud ---
+    if (supabase) {
+        try {
+            const { error } = await supabase
+                .from('gonggu_registrations')
+                .insert([{
+                    id: entry.id,
+                    name: entry.name,
+                    phone: entry.phone,
+                    complex: document.getElementById('aptName').value || '기본단지',
+                    unit: entry.unit,
+                    pyeong: entry.pyeong,
+                    spec: entry.spec,
+                    qty: entry.qty,
+                    chips: JSON.stringify(entry.chips),
+                    memo: entry.memo
+                }]);
+            if (error) console.error('Supabase error:', error);
+        } catch (err) { console.error('Cloud save failed:', err); }
+    }
+
     entries.push(entry);
     saveEntries();
     renderAll();
@@ -1078,11 +1109,59 @@
     document.querySelectorAll('.d-chip').forEach(c => c.classList.remove('active'));
   }
 
-  function deleteEntry(id) {
+  async function deleteEntry(id) {
     if (!confirm('이 신청자를 삭제할까요?')) return;
+    
+    // --- Delete from Supabase Cloud ---
+    if (supabase) {
+        try {
+            await supabase.from('gonggu_registrations').delete().eq('id', id);
+        } catch (err) { console.error('Cloud delete failed:', err); }
+    }
+
     entries = entries.filter(e => e.id !== id);
     saveEntries();
     renderAll();
+  }
+
+  async function syncWithCloud() {
+    if (!supabase || SUPABASE_URL === 'YOUR_SUPABASE_PROJECT_URL') {
+        alert('⚠️ Supabase 설정이 필요합니다. 스크립트 상단에 URL과 Key를 입력해 주세요.');
+        return;
+    }
+
+    const btn = document.getElementById('cloudSyncBtn');
+    btn.innerHTML = '⏳ 동기화 중...';
+    
+    try {
+        const { data, error } = await supabase
+            .from('gonggu_registrations')
+            .select('*')
+            .order('created_at', { ascending: true });
+        
+        if (error) throw error;
+        
+        if (data) {
+            entries = data.map(item => ({
+                id: item.id || Date.now(),
+                name: item.name,
+                phone: item.phone,
+                unit: item.unit,
+                pyeong: item.pyeong,
+                spec: item.spec,
+                qty: item.qty,
+                memo: item.memo,
+                chips: typeof item.chips === 'string' ? JSON.parse(item.chips) : (item.chips || [])
+            }));
+            saveEntries();
+            renderAll();
+            alert(`✅ 클라우드에서 ${entries.length}개의 데이터를 불러왔습니다.`);
+        }
+    } catch (err) {
+        alert('❌ 동기화 실패: ' + err.message);
+    } finally {
+        btn.innerHTML = '🔄 클라우드 동기화';
+    }
   }
 
   function saveEntries() {
